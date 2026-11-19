@@ -12,7 +12,8 @@ export default function RoutinesPage() {
   const [remaining,setRemaining]=useState(false);
   const [showForm,setShowForm]=useState(false);
   const [newTitle,setNewTitle]=useState('');
-  useEffect(()=>{const today=localDate();if(habitsDate!==today){setItems(old=>old.map(item=>({...item,done:false})));setHabitsDate(today);}},[habitsDate,setItems,setHabitsDate]);
+  const today=localDate();
+  useEffect(()=>{if(habitsDate!==today){setItems(old=>old.map(item=>({...item,done:false})));setHabitsDate(today);}},[habitsDate,today,setItems,setHabitsDate]);
   const done=items.filter(x=>x.done).length;
   function toggleRoutine(id:number,title:string,wasDone:boolean) {
     setItems(old=>old.map(x=>x.id===id?{...x,done:!x.done}:x));
