@@ -44,6 +44,7 @@ export default function ActivityPage() {
     const record: ActivityRecord = { id: Date.now(), name: name.trim() || kind, kind, minutes: Math.max(1, Number(minutes) || 1), steps: Math.max(0, Number(steps) || 0), date, ...(distance.trim() ? { distanceKm: Math.max(0, Number(distance) || 0) * (preferences.distanceUnit === 'mi' ? 1.60934 : 1) } : {}) };
     setEntries(current => [record, ...current]);
     setName('');
+    setDistance('');
     setShowForm(false);
   }
 
