@@ -10,13 +10,14 @@ export default function Overview() {
   const [habits,setHabits]=usePersistentState('ovara.habits',habitsSeed);
   const [habitsDate,setHabitsDate]=usePersistentState('ovara.habitsDate',localDate());
   const [water,setWater]=usePersistentState('ovara.waterGlasses',0);
+  const [waterDate,setWaterDate]=usePersistentState('ovara.waterDate',localDate());
   const [waterLog,setWaterLog]=usePersistentState<WaterEntry[]>('ovara.waterLog',[]);
   const [mood,setMood]=usePersistentState('ovara.dailyMood','');
   const [journals,setJournals]=usePersistentState<JournalEntry[]>('ovara.journalEntries',[]);
   const [completions,setCompletions]=usePersistentState<RoutineCompletion[]>('ovara.routineCompletions',[]);
   const [preferences]=usePersistentState<Preferences>('ovara.preferences',defaultPreferences);
   const [activities]=usePersistentState<ActivityRecord[]>('ovara.activities',[]);
-  useEffect(()=>{const today=localDate();if(habitsDate!==today){setHabits(old=>old.map(item=>({...item,done:false})));setHabitsDate(today);}},[habitsDate,setHabits,setHabitsDate]);
+  useEffect(()=>{const today=localDate();if(habitsDate!==today){setHabits(old=>old.map(item=>({...item,done:false})));setHabitsDate(today);}if(waterDate!==today){setWater(0);setWaterDate(today);}},[habitsDate,waterDate,setHabits,setHabitsDate,setWater,setWaterDate]);
   const done=habits.filter(h=>h.done).length;
   const todayKey=localDate();
   const todayActivities=activities.filter(entry=>entry.date===todayKey);
