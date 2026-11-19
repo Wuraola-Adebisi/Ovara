@@ -33,5 +33,5 @@ function Workspace() {
 }
 
 export default function App() {
-  return <Routes><Route element={<SiteLayout/>}><Route index element={<HomePage/>}/><Route path="about" element={<AboutPage/>}/><Route path="contact" element={<ContactPage/>}/><Route path="terms" element={<TermsPage/>}/><Route path="privacy" element={<PrivacyPage/>}/></Route><Route path="/app/*" element={<AppShell/>}><Route index element={<Overview/>}/><Route path="activity" element={<ActivityPage/>}/><Route path="nutrition" element={<NutritionPage/>}/><Route path="routines" element={<RoutinesPage/>}/><Route path="journal" element={<JournalPage/>}/></Route></Routes>;
+  return <Routes><Route element={<SiteLayout/>}><Route index element={<HomePage/>}/><Route path="about" element={<AboutPage/>}/><Route path="contact" element={<ContactPage/>}/><Route path="terms" element={<TermsPage/>}/><Route path="privacy" element={<PrivacyPage/>}/></Route><Route path="/app" element={<AppShell/>}><Route index element={<Overview/>}/><Route path="activity" element={<ActivityPage/>}/><Route path="nutrition" element={<NutritionPage/>}/><Route path="routines" element={<RoutinesPage/>}/><Route path="journal" element={<JournalPage/>}/></Route></Routes>;
 }
