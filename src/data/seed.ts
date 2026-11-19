@@ -14,7 +14,7 @@ export const mealsSeed: Meal[] = [
   { id: 3, name: 'Apple and yoghurt', kind: 'Snack', time: '4:00 PM', cal: 180, desc: 'A simple afternoon snack' },
 ];
 
-export type ActivityRecord = { id: number; name: string; kind: string; minutes: number; steps: number; date: string };
+export type ActivityRecord = { id: number; name: string; kind: string; minutes: number; steps: number; date: string; distanceKm?: number };
 
 function dateOffset(offset: number) {
   const date = new Date();
