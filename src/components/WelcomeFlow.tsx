@@ -24,7 +24,7 @@ export default function WelcomeFlow({ onComplete }: { onComplete: (profile: User
       setError('Add your name and email to continue.');
       return;
     }
-    if (!/^\\S+@\\S+\\.\\S+$/.test(email)) {
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
       setError('Enter a valid email address.');
       return;
     }
