@@ -1,4 +1,4 @@
-import { buildLocalInsights, type getRangeStats } from '../lib/wellbeing';
+import { buildLocalInsights, getRangeStats } from '../lib/wellbeing';
 
 export type InsightPeriod = 'week' | 'month';
 export type InsightCard = { title: string; body: string; tone: 'sage' | 'clay' | 'sand' };
