@@ -1,22 +1,19 @@
 # Ovara
 
-Ovara brings everyday wellbeing activities into one personal space: movement, nutrition, hydration, routines and reflection.
+Ovara brings everyday wellbeing into one thoughtful space: movement, nourishment, hydration, routines and reflection.
 
-**Your everyday, in better balance.**
+**Feel good in your own way.**
 
-## Current MVP build
+## What's included
 
-The application includes:
-
-- A first-use profile and wellbeing-preferences flow.
-- A personal overview with activity, hydration and routine summaries.
-- Activity logging, editable records and a seven-day step history.
-- Meal logging and hydration tracking.
-- Custom routines with completion tracking.
-- A personal journal with saved mood and reflection.
-- Browser persistence so a tester can return to the same data on the same device.
-
-The current build uses seeded starting records and browser storage. The profile flow simulates account setup; it is **not production authentication**. Data is not synced across devices, shared with a research dashboard, or backed up to a server. Do not enter sensitive health information into this build. Supabase, secure authentication, device integrations and centralised tester analytics are planned for a later milestone.
+- A visual public homepage with an editorial wellness identity and photography.
+- About, Contact, Privacy and Terms pages.
+- A personal wellbeing space with profile setup and preferences.
+- Activity logging and a seven-day movement view.
+- Meal notes and hydration tracking, without a compulsory calorie target.
+- Custom routines and completion tracking.
+- Mood check-ins and a personal journal.
+- Browser-based saving so entries remain available in the same browser.
 
 ## Stack
 
@@ -34,23 +31,34 @@ npm install
 npm run dev
 ```
 
-Open the local URL printed by Vite in your terminal (usually http://localhost:5173).
+Open the local URL printed by Vite (usually http://localhost:5173).
 
-## Production build
+## Contact form
+
+The contact form opens the visitor's email application. Set the destination inbox in a local `.env` file:
+
+```bash
+VITE_CONTACT_EMAIL=your-inbox@example.com
+```
+
+The `.env.example` file shows the variable name. Do not commit private credentials or secrets.
+
+## Build check
 
 ```bash
 npm run build
-npm run preview
 ```
 
-## Reset local test data
+A GitHub Actions workflow also runs the TypeScript and Vite build check on pushes and pull requests to `main`.
 
-The MVP stores its profile and records in browser local storage. To start onboarding again, clear the site's local storage in your browser's developer tools, then refresh the page.
+## Saved information
+
+The personal space currently saves profile details and entries in browser storage on the device being used. There is no cross-device sync or cloud backup. The Privacy page explains this clearly. Clear the website's local storage or use **Reset your space** to start over.
 
 ## Product principles
 
 - Personal wellbeing, not medical diagnosis or treatment.
 - Inclusive of different fitness levels and personal goals.
-- Clear about what is sample data and what a person has recorded.
-- International-ready: units, locale, dates and time zones should be user preferences.
-- Sensitive personal records require explicit access controls before a production launch.
+- No compulsory calorie target or single definition of progress.
+- Clear about what is stored and where it is stored.
+- Sensitive personal records need strong access controls and careful handling.
