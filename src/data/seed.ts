@@ -1,5 +1,5 @@
 export type Habit = { id: number; title: string; detail: string; time: string; done: boolean };
-export type Meal = { id: number; name: string; kind: string; time: string; cal: number; desc: string };
+export type Meal = { id: number; name: string; kind: string; time: string; cal: number; desc: string; date?: string };
 
 export const habitsSeed: Habit[] = [
   { id: 1, title: 'Drink a glass of water', detail: 'Start the day hydrated', time: 'Morning', done: false },
@@ -14,7 +14,7 @@ export const mealsSeed: Meal[] = [
   { id: 3, name: 'Apple and yoghurt', kind: 'Snack', time: '4:00 PM', cal: 180, desc: 'A simple afternoon snack' },
 ];
 
-export type ActivityRecord = { id: number; name: string; kind: string; minutes: number; steps: number; date: string };
+export type ActivityRecord = { id: number; name: string; kind: string; minutes: number; steps: number; date: string; distanceKm?: number };
 
 function dateOffset(offset: number) {
   const date = new Date();
