@@ -1,5 +1,5 @@
 export type Habit = { id: number; title: string; detail: string; time: string; done: boolean };
-export type Meal = { id: number; name: string; kind: string; time: string; cal: number; desc: string };
+export type Meal = { id: number; name: string; kind: string; time: string; cal: number; desc: string; date?: string };
 
 export const habitsSeed: Habit[] = [
   { id: 1, title: 'Drink a glass of water', detail: 'Start the day hydrated', time: 'Morning', done: false },
