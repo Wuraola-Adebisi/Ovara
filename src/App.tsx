@@ -35,7 +35,7 @@ function Workspace() {
   const links = [
     ['Overview', '/app', LayoutDashboard], ['Activity', '/app/activity', Footprints],
     ['Nutrition', '/app/nutrition', Utensils], ['Routines', '/app/routines', ListChecks],
-    ['Journal', '/app/journal', BookHeart], ['Insights', '/app/insights', ChartNoAxesCombined],
+    ['Journal', '/app/journal', BookHeart], ['Insights', '/app/insights', TrendingUp],
     ['Goals', '/app/goals', Target], ['Calendar', '/app/calendar', CalendarDays],
     ['Preferences', '/app/settings', Settings2],
   ] as const;
