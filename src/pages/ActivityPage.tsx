@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Activity, Clock3, Footprints, Plus, Trash2 } from 'lucide-react';
 import { Header, PanelTitle, Metric } from '../components/PagePrimitives';
-import { activitySeed } from '../data/seed';
 import type { ActivityRecord } from '../data/seed';
 import { usePersistentState } from '../hooks/usePersistentState';
 
@@ -14,7 +13,7 @@ function localDate(date: Date) {
 }
 
 export default function ActivityPage() {
-  const [entries, setEntries] = usePersistentState<ActivityRecord[]>('ovara.activities', activitySeed);
+  const [entries, setEntries] = usePersistentState<ActivityRecord[]>('ovara.activities',[]);
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState('');
   const [kind, setKind] = useState('Walking');
