@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Bell, Check, Droplets, Footprints, Settings2 } from 'lucide-react';
 import { Header, PanelTitle } from '../components/PagePrimitives';
 import { usePersistentState } from '../hooks/usePersistentState';
@@ -17,23 +17,6 @@ export default function SettingsPage() {
   const [notice, setNotice] = useState('');
   const [newReminderTitle, setNewReminderTitle] = useState('');
   const [newReminderTime, setNewReminderTime] = useState('09:00');
-  useEffect(() => {
-    if (typeof Notification === 'undefined') return;
-    const check = () => {
-      const now = new Date();
-      const day = now.getDay();
-      const time = [String(now.getHours()).padStart(2,'0'), String(now.getMinutes()).padStart(2,'0')].join(':');
-      reminders.filter(item => item.enabled && item.time === time && item.days.includes(day)).forEach(item => {
-        const key = 'ovara.reminder.last.' + item.id;
-        if (window.sessionStorage.getItem(key) === new Date().toDateString()) return;
-        if (Notification.permission === 'granted') new Notification('Ovara · ' + item.title, { body: 'A gentle reminder, at a time you chose.' });
-        window.sessionStorage.setItem(key, new Date().toDateString());
-      });
-    };
-    check();
-    const timer = window.setInterval(check, 30000);
-    return () => window.clearInterval(timer);
-  }, [reminders]);
   async function enableNotifications() {
     if (typeof Notification === 'undefined') { setNotice('This browser does not support notifications.'); return; }
     const result = await Notification.requestPermission();
