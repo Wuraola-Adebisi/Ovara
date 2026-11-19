@@ -1,13 +1,16 @@
 import { useEffect } from 'react';
-import { usePersistentState } from '../hooks/usePersistentState';
-import type { WellbeingReminder } from '../lib/wellbeing';
 
-// Mounted at the workspace shell so reminders remain active across every app section.
+// Reads the saved schedule on each check so changes made in Preferences are picked up.
 export default function ReminderScheduler() {
-  const [reminders] = usePersistentState<WellbeingReminder[]>('ovara.reminders', []);
   useEffect(() => {
     if (typeof Notification === 'undefined') return;
     const check = () => {
+      let reminders: { id: number; title: string; time: string; enabled: boolean; days: number[] }[] = [];
+      try {
+        reminders = JSON.parse(window.localStorage.getItem('ovara.reminders') || '[]');
+      } catch {
+        reminders = [];
+      }
       const now = new Date();
       const day = now.getDay();
       const time = [String(now.getHours()).padStart(2, '0'), String(now.getMinutes()).padStart(2, '0')].join(':');
@@ -23,6 +26,6 @@ export default function ReminderScheduler() {
     check();
     const timer = window.setInterval(check, 30000);
     return () => window.clearInterval(timer);
-  }, [reminders]);
+  }, []);
   return null;
 }
