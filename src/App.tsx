@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, Route, Routes } from 'react-router-dom';
 import { Activity, BookHeart, ChevronDown, Footprints, Heart, LayoutDashboard, ListChecks, Menu, Plus, Settings2, Utensils, X } from 'lucide-react';
 import { usePersistentState } from './hooks/usePersistentState';
-import { ProfileContext } from './context/ProfileContext';
+import { ProfileContext, useProfile } from './context/ProfileContext';
 import type { UserProfile } from './context/ProfileContext';
 import WelcomeFlow from './components/WelcomeFlow';
 import SiteLayout from './components/SiteLayout';
@@ -24,7 +24,7 @@ function AppShell() {
 }
 
 function Workspace() {
-  const { profile, setProfile } = requireProfile();
+  const { profile } = useProfile();
   const [menuOpen, setMenuOpen] = useState(false);
   const [quickOpen, setQuickOpen] = useState(false);
   useEffect(() => { const show = () => setQuickOpen(true); window.addEventListener('ovara:add', show); return () => window.removeEventListener('ovara:add', show); }, []);
