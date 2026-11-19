@@ -28,12 +28,12 @@ export function shiftDate(date: Date, amount: number) {
   return next;
 }
 
-export function startOfPeriod(date: Date, period: GoalPeriod) {
+export function startOfPeriod(date: Date, period: GoalPeriod, weekStartsOn: 0 | 1 = 1) {
   const start = new Date(date);
   start.setHours(0, 0, 0, 0);
   if (period === 'daily') return start;
   if (period === 'weekly') {
-    const day = (start.getDay() + 6) % 7;
+    const day = (start.getDay() - weekStartsOn + 7) % 7;
     start.setDate(start.getDate() - day);
     return start;
   }
@@ -78,8 +78,8 @@ export function collectEvents(data: {
 
 export function getGoalValue(goal: WellbeingGoal, data: {
   activities: ActivityRecord[]; water: WaterEntry[]; journals: JournalEntry[]; completions: RoutineCompletion[];
-}, now = new Date()) {
-  const start = startOfPeriod(now, goal.period);
+}, now = new Date(), weekStartsOn: 0 | 1 = 1) {
+  const start = startOfPeriod(now, goal.period, weekStartsOn);
   const startKey = localDate(start);
   const endKey = localDate(now);
   const activities = data.activities.filter(item => item.date >= startKey && item.date <= endKey);
