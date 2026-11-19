@@ -17,9 +17,9 @@ export default function Overview() {
   const [completions,setCompletions]=usePersistentState<RoutineCompletion[]>('ovara.routineCompletions',[]);
   const [preferences]=usePersistentState<Preferences>('ovara.preferences',defaultPreferences);
   const [activities]=usePersistentState<ActivityRecord[]>('ovara.activities',[]);
-  useEffect(()=>{const today=localDate();if(habitsDate!==today){setHabits(old=>old.map(item=>({...item,done:false})));setHabitsDate(today);}if(waterDate!==today){setWater(0);setWaterDate(today);}},[habitsDate,waterDate,setHabits,setHabitsDate,setWater,setWaterDate]);
-  const done=habits.filter(h=>h.done).length;
   const todayKey=localDate();
+  useEffect(()=>{if(habitsDate!==todayKey){setHabits(old=>old.map(item=>({...item,done:false})));setHabitsDate(todayKey);}if(waterDate!==todayKey){setWater(0);setWaterDate(todayKey);}},[habitsDate,waterDate,todayKey,setHabits,setHabitsDate,setWater,setWaterDate]);
+  const done=habits.filter(h=>h.done).length;
   const todayActivities=activities.filter(entry=>entry.date===todayKey);
   const todaySteps=todayActivities.reduce((sum,entry)=>sum+entry.steps,0);
   const todayMinutes=todayActivities.reduce((sum,entry)=>sum+entry.minutes,0);
