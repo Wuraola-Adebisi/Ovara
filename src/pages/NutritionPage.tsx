@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { usePersistentState } from '../hooks/usePersistentState';
 import type { Meal } from '../data/seed';
@@ -9,6 +9,7 @@ import { defaultPreferences, localDate, type Preferences, type WaterEntry } from
 export default function NutritionPage() {
   const [meals, setMeals] = usePersistentState<Meal[]>('ovara.meals', []);
   const [water, setWater] = usePersistentState('ovara.waterGlasses', 0);
+  const [waterDate, setWaterDate] = usePersistentState('ovara.waterDate', localDate());
   const [waterLog, setWaterLog] = usePersistentState<WaterEntry[]>('ovara.waterLog', []);
   const [preferences] = usePersistentState<Preferences>('ovara.preferences', defaultPreferences);
   const [showForm, setShowForm] = useState(false);
@@ -16,6 +17,7 @@ export default function NutritionPage() {
   const [mealKind, setMealKind] = useState('Breakfast');
   const [energy, setEnergy] = useState('');
   const today = localDate();
+  useEffect(() => { if (waterDate !== today) { setWater(0); setWaterDate(today); } }, [waterDate, today, setWater, setWaterDate]);
   const todayMeals = meals.filter(meal => !meal.date || meal.date === today);
   const todayWaterMl = waterLog.filter(item => item.date === today).reduce((sum,item)=>sum+item.ml,0);
   const todayGlasses = todayWaterMl ? Math.round(todayWaterMl / 250) : water;
