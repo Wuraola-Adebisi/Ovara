@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, Route, Routes } from 'react-router-dom';
-import { BookHeart, CalendarDays, ChartNoAxesCombined, ChevronDown, Footprints, Heart, LayoutDashboard, ListChecks, Menu, Plus, Settings2, Target, Utensils, X } from 'lucide-react';
+import { BookHeart, CalendarDays, TrendingUp, ChevronDown, Footprints, Heart, LayoutDashboard, ListChecks, Menu, Plus, Settings2, Target, Utensils, X } from 'lucide-react';
 import { usePersistentState } from './hooks/usePersistentState';
 import { ProfileContext, useProfile } from './context/ProfileContext';
 import type { UserProfile } from './context/ProfileContext';
