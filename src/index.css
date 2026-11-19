@@ -23,3 +23,16 @@ body{background:var(--paper);color:var(--ink)}button,a{font-family:inherit}.bran
 .faq-section{max-width:1250px;margin:auto;padding:35px 7% 90px}.faq-grid{display:grid;grid-template-columns:.7fr 1.3fr;gap:8%;margin-top:35px}.faq-grid h2{font:400 58px/.95 'Instrument Serif';color:#354b3e;margin:0}.faq-grid h2 em{color:#b66d52}.faq-list details{border-bottom:1px solid #ded8cb;padding:17px 0}.faq-list details:first-child{border-top:1px solid #ded8cb}.faq-list summary{cursor:pointer;list-style:none;font:400 21px 'Instrument Serif';color:#3b4e3e;display:flex;justify-content:space-between;gap:15px}.faq-list summary::-webkit-details-marker{display:none}.faq-list summary:after{content:'+';font:400 20px 'DM Sans';color:#b66d52}.faq-list details[open] summary:after{content:'−'}.faq-list details p{max-width:580px;font-size:11px;line-height:1.8;color:#7b8075;margin:12px 0 2px}.site-shell a:focus-visible,.site-shell button:focus-visible,.site-shell summary:focus-visible{outline:2px solid #b9694f;outline-offset:4px}
 @media(max-width:650px){.faq-section{padding:20px 23px 65px}.faq-grid{grid-template-columns:1fr;gap:25px;margin-top:22px}.faq-grid h2{font-size:50px}.faq-list summary{font-size:19px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+
+/* Public-site mobile navigation */
+.mobile-menu-toggle{display:none;border:1px solid #ded8cb;background:transparent;color:#354b3e;width:40px;height:40px;align-items:center;justify-content:center;cursor:pointer}
+@media(max-width:650px){
+  .site-header{position:relative;z-index:20}
+  .mobile-menu-toggle{display:inline-flex;margin-left:auto;margin-right:12px}
+  .site-header-cta{white-space:nowrap}
+  .site-nav{display:none;position:absolute;top:calc(100% + 1px);left:0;right:0;padding:18px 22px 22px;background:#f8f5ee;border-bottom:1px solid #e4ddcf;box-shadow:0 14px 24px #29352f0d;align-items:stretch;gap:0;flex-direction:column}
+  .site-nav.is-open{display:flex}
+  .site-nav a{padding:14px 2px;border-bottom:1px solid #e9e3d8;font-size:13px}
+  .site-nav a:last-child{border-bottom:0}
+}
