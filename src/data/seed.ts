@@ -13,3 +13,21 @@ export const mealsSeed: Meal[] = [
   { id: 2, name: 'Rice bowl with vegetables', kind: 'Lunch', time: '1:10 PM', cal: 560, desc: 'Rice, vegetables and protein' },
   { id: 3, name: 'Apple and yoghurt', kind: 'Snack', time: '4:00 PM', cal: 180, desc: 'A simple afternoon snack' },
 ];
+
+export type ActivityRecord = { id: number; name: string; kind: string; minutes: number; steps: number; date: string };
+
+function dateOffset(offset: number) {
+  const date = new Date();
+  date.setDate(date.getDate() + offset);
+  return date.toISOString().slice(0, 10);
+}
+
+export const activitySeed: ActivityRecord[] = [
+  { id: 101, name: 'Morning walk', kind: 'Walking', minutes: 28, steps: 4200, date: dateOffset(-6) },
+  { id: 102, name: 'Evening walk', kind: 'Walking', minutes: 32, steps: 5100, date: dateOffset(-5) },
+  { id: 103, name: 'Stretch and mobility', kind: 'Stretching', minutes: 18, steps: 600, date: dateOffset(-4) },
+  { id: 104, name: 'Neighbourhood walk', kind: 'Walking', minutes: 41, steps: 6300, date: dateOffset(-3) },
+  { id: 105, name: 'Home workout', kind: 'Strength', minutes: 35, steps: 900, date: dateOffset(-2) },
+  { id: 106, name: 'Afternoon walk', kind: 'Walking', minutes: 25, steps: 3800, date: dateOffset(-1) },
+  { id: 107, name: 'Morning walk', kind: 'Walking', minutes: 31, steps: 6240, date: dateOffset(0) },
+];
