@@ -26,7 +26,7 @@ export default function CalendarPage() {
     return localDate(new Date(year, monthIndex, day));
   });
   const selectedEvents = events.filter(event => event.date === selected);
-  function changeMonth(amount: number) { setMonth(current => new Date(current.getFullYear(), current.getMonth() + amount, 1)); }
+  function changeMonth(amount: number) { const next = new Date(month.getFullYear(), month.getMonth() + amount, 1); setMonth(next); setSelected(localDate(next)); }
   return <div className="stack">
     <Header tag="YOUR WELLBEING, IN ONE PLACE" title="A view of your days." desc="See movement, meals, routines, hydration and reflections together."/>
     <section className="calendar-layout">
