@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { usePersistentState } from '../hooks/usePersistentState';
 import { habitsSeed } from '../data/seed';
 import { Check, Droplets, Heart, Plus } from 'lucide-react';
@@ -7,10 +7,12 @@ import { localDate, type RoutineCompletion } from '../lib/wellbeing';
 
 export default function RoutinesPage() {
   const [items,setItems]=usePersistentState('ovara.habits',habitsSeed);
+  const [habitsDate,setHabitsDate]=usePersistentState('ovara.habitsDate',localDate());
   const [completions,setCompletions]=usePersistentState<RoutineCompletion[]>('ovara.routineCompletions',[]);
   const [remaining,setRemaining]=useState(false);
   const [showForm,setShowForm]=useState(false);
   const [newTitle,setNewTitle]=useState('');
+  useEffect(()=>{const today=localDate();if(habitsDate!==today){setItems(old=>old.map(item=>({...item,done:false})));setHabitsDate(today);}},[habitsDate,setItems,setHabitsDate]);
   const done=items.filter(x=>x.done).length;
   function toggleRoutine(id:number,title:string,wasDone:boolean) {
     setItems(old=>old.map(x=>x.id===id?{...x,done:!x.done}:x));
