@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Header, PanelTitle } from '../components/PagePrimitives';
 import { usePersistentState } from '../hooks/usePersistentState';
-import { collectEvents, localDate, type JournalEntry, type RoutineCompletion, type WaterEntry } from '../lib/wellbeing';
+import { collectEvents, defaultPreferences, localDate, type JournalEntry, type RoutineCompletion, type WaterEntry } from '../lib/wellbeing';
 import type { ActivityRecord, Meal } from '../data/seed';
 
 const colors: Record<string, string> = { activity: 'activity', meal: 'meal', water: 'water', journal: 'journal', routine: 'routine' };
@@ -15,9 +15,10 @@ export default function CalendarPage() {
   const [water] = usePersistentState<WaterEntry[]>('ovara.waterLog', []);
   const [journals] = usePersistentState<JournalEntry[]>('ovara.journalEntries', []);
   const [completions] = usePersistentState<RoutineCompletion[]>('ovara.routineCompletions', []);
+  const [preferences] = usePersistentState('ovara.preferences', defaultPreferences);
   const events = useMemo(() => collectEvents({ activities, meals, water, journals, completions }), [activities, meals, water, journals, completions]);
   const year = month.getFullYear(), monthIndex = month.getMonth();
-  const offset = (new Date(year, monthIndex, 1).getDay() + 6) % 7;
+  const offset = (new Date(year, monthIndex, 1).getDay() - preferences.weekStartsOn + 7) % 7;
   const count = new Date(year, monthIndex + 1, 0).getDate();
   const cells = Array.from({ length: Math.ceil((offset + count) / 7) * 7 }, (_, index) => {
     const day = index - offset + 1;
@@ -31,7 +32,7 @@ export default function CalendarPage() {
     <section className="calendar-layout">
       <article className="panel calendar-panel">
         <div className="calendar-heading"><div><label>YOUR CALENDAR</label><h3>{month.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}</h3></div><div className="calendar-nav"><button aria-label="Previous month" onClick={() => changeMonth(-1)}><ChevronLeft size={17}/></button><button aria-label="Next month" onClick={() => changeMonth(1)}><ChevronRight size={17}/></button></div></div>
-        <div className="calendar-grid calendar-weekdays">{['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(day => <span key={day}>{day}</span>)}</div>
+        <div className="calendar-grid calendar-weekdays">{Array.from({length:7},(_,index)=>['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][(preferences.weekStartsOn+index)%7]).map((day,index) => <span key={day+index}>{day}</span>)}</div>
         <div className="calendar-grid">{cells.map((key, index) => { const dayEvents = key ? events.filter(event => event.date === key) : []; return <button key={key || 'empty-' + index} disabled={!key} className={'calendar-day ' + (key === selected ? 'selected' : '') + (key === localDate() ? ' today' : '')} onClick={() => key && setSelected(key)}><b>{key ? Number(key.slice(-2)) : ''}</b><span>{dayEvents.slice(0, 4).map(event => <i key={event.id} className={colors[event.type]} title={event.title}/>)}</span>{dayEvents.length > 4 && <small>+{dayEvents.length - 4}</small>}</button> })}</div>
         <div className="calendar-legend">{Object.entries(colors).map(([type, color]) => <span key={type}><i className={color}/>{type === 'meal' ? 'Meals' : type[0].toUpperCase() + type.slice(1)}</span>)}</div>
       </article>
