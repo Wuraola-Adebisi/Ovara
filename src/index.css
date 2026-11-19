@@ -142,3 +142,5 @@ body{background:var(--paper);color:var(--ink)}button,a{font-family:inherit}.bran
 .reminder-days button{width:21px;height:21px;border:1px solid #e5e0d6;background:#faf8f2;color:#969587;border-radius:50%;font-size:8px;padding:0}
 .reminder-days button.active{background:#e8e9dc;border-color:#b8bda8;color:#455b43}
 @media(max-width:650px){.add-reminder{grid-template-columns:1fr 90px auto}}
+
+.sidebar{overflow-y:auto;}
