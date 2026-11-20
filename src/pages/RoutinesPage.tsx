@@ -95,7 +95,7 @@ export default function RoutinesPage() {
         <Meter value={doneCount} max={habits.length} label="Routines completed today"/>
       </Card>
       <Card title="This week">
-        <div className="routine-week-stats"><div><b>{weeklyDone}</b><span>check-ins</span></div><div><b>{activeDays}/7</b><span>days with a check-in</span></div><div><b>{habits.length}</b><span>current routines</span></div></div>
+        <div className="routine-week-stats"><div><b>{weeklyTotal}</b><span>check-ins</span></div><div><b>{activeDays}/7</b><span>days with a check-in</span></div><div><b>{habits.length}</b><span>current routines</span></div></div>
         <div className="routine-week-dots" aria-label={activeDays + ' days with routine check-ins in the last seven days'}>
           {days.map(day => <span key={day.key} className={weeklyDone.some(item => item.date === day.key) ? 'is-active' : ''} title={formatDay(day.key, { weekday: 'long', day: 'numeric', month: 'short' })}/>)}
         </div>
