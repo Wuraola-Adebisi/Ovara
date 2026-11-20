@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Pencil, Plus, Trash2, X } from 'lucide-react';
 import { useStore } from '../lib/store';
 import { useToday } from '../hooks/useToday';
@@ -15,6 +15,7 @@ const kinds = ['Walking', 'Running', 'Cycling', 'Strength', 'Swimming', 'Yoga', 
 
 export default function ActivityPage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const today = useToday();
   const toast = useToast();
   const [entries, setEntries] = useStore('activities');
@@ -59,6 +60,15 @@ export default function ActivityPage() {
     setDate(entry.date);
     setShowForm(true);
   }
+
+  useEffect(() => {
+    const eventId = (location.state as { calendarEventId?: string } | null)?.calendarEventId;
+    if (!eventId?.startsWith('activity-')) return;
+    const entryId = Number(eventId.slice('activity-'.length));
+    const entry = entries.find(item => item.id === entryId);
+    if (entry) startEdit(entry);
+    navigate(location.pathname, { replace: true, state: null });
+  }, [location.key, entries]);
 
   function saveEntry(event: FormEvent) {
     event.preventDefault();

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Check, Edit3, Trash2 } from 'lucide-react';
 import { useStore } from '../lib/store';
 import { useToday } from '../hooks/useToday';
@@ -28,9 +29,11 @@ const prompts = [
 const dateLabel = (key: string) => formatDay(key, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
 export default function JournalPage() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const today = useToday();
   const [entries, setEntries] = useStore('journals');
-  const [selectedDate, setSelectedDate] = useState(today);
+  const [selectedDate, setSelectedDate] = useState(() => (location.state as { calendarDate?: string } | null)?.calendarDate ?? today);
   const [mood, setMood] = useState('');
   const [note, setNote] = useState('');
   const [dirty, setDirty] = useState(false);
@@ -46,6 +49,12 @@ export default function JournalPage() {
     setNote(selectedEntry?.note ?? '');
     setSaved(false);
   }, [selectedDate, selectedEntry?.id, selectedEntry?.mood, selectedEntry?.note, dirty]);
+
+  useEffect(() => {
+    const state = location.state as { calendarDate?: string; calendarEventId?: string } | null;
+    if (state?.calendarDate) changeDate(state.calendarDate);
+    if (state?.calendarEventId?.startsWith('journal-')) navigate(location.pathname, { replace: true, state: null });
+  }, [location.key]);
 
   const sorted = useMemo(() => [...entries].sort((a, b) => b.date.localeCompare(a.date)), [entries]);
   const past = sorted.filter(entry => entry.date !== today);

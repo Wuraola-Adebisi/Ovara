@@ -21,13 +21,24 @@ export default function ReminderScheduler() {
         if (late < 0 || late > GRACE_MINUTES) return;
         const key = 'ovara.reminderSent.' + item.id;
         if (window.localStorage.getItem(key) === now.toDateString()) return;
-        window.localStorage.setItem(key, now.toDateString());
-        new Notification('Ovara: ' + item.title, { body: 'Reminder for ' + item.time + '.' });
+        try {
+          new Notification('Ovara: ' + item.title, { body: 'Your reminder was scheduled for ' + item.time + '.' });
+          window.localStorage.setItem(key, now.toDateString());
+        } catch {
+          // Notification delivery can fail if browser or operating-system settings change.
+        }
       });
     };
     check();
     const timer = window.setInterval(check, 30000);
-    return () => window.clearInterval(timer);
+    const onWake = () => { if (document.visibilityState === 'visible') check(); };
+    window.addEventListener('focus', onWake);
+    document.addEventListener('visibilitychange', onWake);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener('focus', onWake);
+      document.removeEventListener('visibilitychange', onWake);
+    };
   }, []);
   return null;
 }

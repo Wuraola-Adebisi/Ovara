@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import type { FormEvent } from 'react';
 import { Edit3, Plus, Trash2, X } from 'lucide-react';
 import { useStore } from '../lib/store';
@@ -11,9 +12,12 @@ import type { Habit } from '../lib/types';
 const times = ['Morning', 'Afternoon', 'Evening', 'Anytime'];
 
 export default function RoutinesPage() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const today = useToday();
   const [habits, setHabits] = useStore('habits');
   const [completions, setCompletions] = useStore('completions');
+  const [selectedDate, setSelectedDate] = useState(() => (location.state as { calendarDate?: string } | null)?.calendarDate ?? today);
   const toast = useToast();
   const [filter, setFilter] = useState<'all' | 'remaining'>('all');
   const [showForm, setShowForm] = useState(false);
@@ -22,8 +26,14 @@ export default function RoutinesPage() {
   const [detail, setDetail] = useState('');
   const [time, setTime] = useState('Anytime');
 
+  useEffect(() => {
+    if ((location.state as { calendarDate?: string } | null)?.calendarDate) {
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [location.key]);
+
   const days = useMemo(() => lastDays(7), []);
-  const doneIds = new Set(completions.filter(item => item.date === today).map(item => item.routineId));
+  const doneIds = new Set(completions.filter(item => item.date === selectedDate).map(item => item.routineId));
   const doneCount = habits.filter(habit => doneIds.has(habit.id)).length;
   const visible = habits.filter(habit => filter === 'all' || !doneIds.has(habit.id));
   const weeklyDone = completions.filter(item => days.some(day => day.key === item.date));
@@ -60,8 +70,8 @@ export default function RoutinesPage() {
   }
 
   function toggle(id: number, name: string) {
-    if (doneIds.has(id)) setCompletions(current => current.filter(item => !(item.routineId === id && item.date === today)));
-    else setCompletions(current => [...current, { id: Date.now(), date: today, routineId: id, title: name }]);
+    if (doneIds.has(id)) setCompletions(current => current.filter(item => !(item.routineId === id && item.date === selectedDate)));
+    else setCompletions(current => [...current, { id: Date.now(), date: selectedDate, routineId: id, title: name }]);
   }
 
   function deleteRoutine(habit: Habit) {
@@ -91,8 +101,8 @@ export default function RoutinesPage() {
 
     <div className="grid-2 routine-overview">
       <Card>
-        <p className="big-number">{doneCount}<small> of {habits.length} completed today</small></p>
-        <Meter value={doneCount} max={habits.length} label="Routines completed today"/>
+        <p className="big-number">{doneCount}<small> of {habits.length} completed on {selectedDate === today ? 'today' : formatDay(selectedDate, { day: 'numeric', month: 'short' })}</small></p>
+        <Meter value={doneCount} max={habits.length} label="Routines completed on selected day"/>
       </Card>
       <Card title="This week">
         <div className="routine-week-stats"><div><b>{weeklyTotal}</b><span>check-ins</span></div><div><b>{activeDays}/7</b><span>days with a check-in</span></div><div><b>{habits.length}</b><span>current routines</span></div></div>
@@ -102,12 +112,12 @@ export default function RoutinesPage() {
       </Card>
     </div>
 
-    <Card title="Today's list" action={<div className="segmented" role="group" aria-label="Filter routines">
+    <Card title={selectedDate === today ? "Today's list" : 'Routines for ' + formatDay(selectedDate, { day: 'numeric', month: 'long', year: 'numeric' })} action={<div className="btn-row"><label className="journal-date-field"><span className="sr-only">Routine date</span><input type="date" value={selectedDate} max={today} onChange={event => setSelectedDate(event.target.value)} aria-label="Choose routine date"/></label><div className="segmented" role="group" aria-label="Filter routines">
       <button type="button" aria-pressed={filter === 'all'} onClick={() => setFilter('all')}>All</button>
       <button type="button" aria-pressed={filter === 'remaining'} onClick={() => setFilter('remaining')}>Remaining</button>
-    </div>}>
+    </div></div>}>
       {habits.length === 0 ? <EmptyState title="No routines yet" body="Add one to get started, such as a short walk or reading before bed."/> :
-        visible.length === 0 ? <p className="muted">Everything on the list is done for today.</p> :
+        visible.length === 0 ? <p className="muted">Everything on the list is done for this day.</p> :
         <ul className="rows">
           {visible.map(habit => <li className="row" key={habit.id}>
             <label className="check-row">
