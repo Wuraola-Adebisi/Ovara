@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useStore } from '../lib/store';
 import { useToday } from '../hooks/useToday';
 import { useUndoRemove } from '../hooks/useUndoRemove';
@@ -23,6 +23,7 @@ export default function GoalsPage() {
   const [preferences] = useStore('preferences');
   const remove = useUndoRemove(goals, setGoals);
   const [showForm, setShowForm] = useState(false);
+  const [editingGoalId, setEditingGoalId] = useState<number | null>(null);
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState<GoalCategory>('activity_minutes');
   const [target, setTarget] = useState('150');
@@ -36,12 +37,34 @@ export default function GoalsPage() {
     return formatted.value + ' ' + formatted.unit;
   };
 
-  function addGoal(event: FormEvent) {
+  function resetForm() {
+    setEditingGoalId(null);
+    setTitle('');
+    setCategory('activity_minutes');
+    setTarget('150');
+    setPeriod('weekly');
+    setShowForm(false);
+  }
+
+  function editGoal(goal: WellbeingGoal) {
+    setEditingGoalId(goal.id);
+    setTitle(goal.title);
+    setCategory(goal.category);
+    setTarget(goal.category === 'water_ml' && preferences.waterUnit === 'oz' ? String(Number((goal.target / 29.5735).toFixed(2))) : String(goal.target));
+    setPeriod(goal.period);
+    setShowForm(true);
+  }
+
+  function saveGoal(event: FormEvent) {
     event.preventDefault();
     const typed = Math.max(1, Number(target) || 1);
     const amount = category === 'water_ml' ? Math.max(1, waterToMl(typed, preferences.waterUnit)) : Math.round(typed);
-    setGoals(current => [{ id: Date.now(), title: title.trim() || labels[category], category, target: amount, period, createdAt: new Date().toISOString() }, ...current]);
-    setTitle(''); setShowForm(false);
+    if (editingGoalId !== null) {
+      setGoals(current => current.map(goal => goal.id === editingGoalId ? { ...goal, title: title.trim() || labels[category], category, target: amount, period } : goal));
+    } else {
+      setGoals(current => [{ id: Date.now(), title: title.trim() || labels[category], category, target: amount, period, createdAt: new Date().toISOString() }, ...current]);
+    }
+    resetForm();
   }
 
   function historyFor(goal: WellbeingGoal) {
@@ -69,22 +92,22 @@ export default function GoalsPage() {
   }
 
   return <div className="stack">
-    <PageHeader title="Goals" desc="Targets you set for yourself. Track progress across each period." action={<button type="button" className="btn btn-primary" aria-expanded={showForm} onClick={() => setShowForm(value => !value)}><Plus size={18} aria-hidden="true"/>Add a goal</button>}/>
+    <PageHeader title="Goals" desc="Targets you set for yourself. Track progress across each period." action={<button type="button" className="btn btn-primary" aria-expanded={showForm} onClick={() => { if (showForm) resetForm(); else { resetForm(); setShowForm(true); } }}><Plus size={18} aria-hidden="true"/>Add a goal</button>}/>
     <PageFeature eyebrow="Choose a direction that feels right" text="Goals give your intentions a little structure. Review your progress over time and adjust your targets when your priorities change." image="https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=1200&q=85" imageAlt="A notebook and planner laid out for thoughtful goal setting" />
 
-    {showForm && <form className="card form-card" onSubmit={addGoal}>
-      <div className="card-head"><h2>Add a goal</h2></div>
+    {showForm && <form className="card form-card" onSubmit={saveGoal}>
+      <div className="card-head"><h2>{editingGoalId !== null ? 'Edit goal' : 'Add a goal'}</h2></div>
       <div className="form-grid">
         <label className="field">Name (optional)<input value={title} onChange={event => setTitle(event.target.value)} placeholder="Move more most days" autoComplete="off" maxLength={80}/></label>
         <label className="field">Measure<select value={category} onChange={event => setCategory(event.target.value as GoalCategory)}>{Object.entries(labels).map(([value, label]) => <option value={value} key={value}>{label}</option>)}</select></label>
         <label className="field">Target{category === 'water_ml' ? ' in ' + (preferences.waterUnit === 'oz' ? 'fl oz' : 'ml') : ''}<input type="number" inputMode="numeric" min="1" max="1000000" value={target} onChange={event => setTarget(event.target.value)} required/></label>
         <label className="field">Time frame<select value={period} onChange={event => setPeriod(event.target.value as GoalPeriod)}><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option></select></label>
       </div>
-      <div className="btn-row"><button type="submit" className="btn btn-primary">Save goal</button><button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Cancel</button></div>
+      <div className="btn-row"><button type="submit" className="btn btn-primary">{editingGoalId !== null ? 'Save changes' : 'Save goal'}</button><button type="button" className="btn btn-secondary" onClick={resetForm}>Cancel</button></div>
     </form>}
 
     <Card title="Current progress">
-      {goals.length === 0 ? <EmptyState title="No goals yet" body="Pick one measure and a time frame. Progress fills in as you log." action={<button type="button" className="btn btn-secondary" onClick={() => setShowForm(true)}>Add a goal</button>}/> :
+      {goals.length === 0 ? <EmptyState title="No goals yet" body="Pick one measure and a time frame. Progress fills in as you log." action={<button type="button" className="btn btn-secondary" onClick={() => { resetForm(); setShowForm(true); }}>Add a goal</button>}/> :
         <ul className="goal-list">
           {goals.map(goal => {
             const value = getGoalValue(goal, data, now, preferences.weekStartsOn);
@@ -92,7 +115,7 @@ export default function GoalsPage() {
             return <li className="goal" key={goal.id}>
               <div className="goal-top">
                 <div><b>{goal.title}</b><small>{labels[goal.category]} {periodLabels[goal.period]}</small></div>
-                <button type="button" className="icon-btn" aria-label={'Remove ' + goal.title} onClick={() => remove(goal.id, goal.title)}><Trash2 size={18}/></button>
+                <div className="row-actions"><button type="button" className="icon-btn" aria-label={'Edit ' + goal.title} onClick={() => editGoal(goal)}><Pencil size={17}/></button><button type="button" className="icon-btn" aria-label={'Remove ' + goal.title} onClick={() => remove(goal.id, goal.title)}><Trash2 size={18}/></button></div>
               </div>
               <Meter value={value} max={goal.target} label={goal.title + ' progress'}/>
               <div className="goal-foot"><span>{amountText(goal.category, value)} of {amountText(goal.category, goal.target)}</span><b>{percent >= 100 ? 'Reached' : percent + '%'}</b></div>

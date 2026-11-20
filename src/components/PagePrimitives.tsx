@@ -1,12 +1,34 @@
 import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import type { ReactNode } from 'react';
 
-export function usePageTitle(title: string) {
-  useEffect(() => { document.title = title + ' | Ovara'; }, [title]);
+export function usePageTitle(title: string, pageDescription?: string) {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    const description = pageDescription || 'Ovara brings movement, nourishment, routines and reflection together in one thoughtful space.';
+    document.title = title + ' | Ovara';
+    const setMeta = (selector: string, attribute: string, value: string) => {
+      let element = document.head.querySelector<HTMLMetaElement>(selector);
+      if (!element) { element = document.createElement('meta'); document.head.appendChild(element); }
+      element.setAttribute(attribute, value);
+    };
+    setMeta('meta[name="description"]', 'name', 'description');
+    document.head.querySelector('meta[name="description"]')?.setAttribute('content', description);
+    setMeta('meta[property="og:title"]', 'property', 'og:title');
+    document.head.querySelector('meta[property="og:title"]')?.setAttribute('content', document.title);
+    setMeta('meta[property="og:description"]', 'property', 'og:description');
+    document.head.querySelector('meta[property="og:description"]')?.setAttribute('content', description);
+    setMeta('meta[name="twitter:title"]', 'name', 'twitter:title');
+    document.head.querySelector('meta[name="twitter:title"]')?.setAttribute('content', document.title);
+    setMeta('meta[name="twitter:description"]', 'name', 'twitter:description');
+    document.head.querySelector('meta[name="twitter:description"]')?.setAttribute('content', description);
+    setMeta('meta[name="robots"]', 'name', 'robots');
+    document.head.querySelector('meta[name="robots"]')?.setAttribute('content', pathname.startsWith('/app') ? 'noindex, nofollow' : 'index, follow');
+  }, [title, pageDescription, pathname]);
 }
 
 export function PageHeader({ title, desc, action }: { title: string; desc?: string; action?: ReactNode }) {
-  usePageTitle(title);
+  usePageTitle(title, desc);
   return <header className="page-head"><div><h1>{title}</h1>{desc && <p>{desc}</p>}</div>{action && <div className="page-head-action">{action}</div>}</header>;
 }
 
