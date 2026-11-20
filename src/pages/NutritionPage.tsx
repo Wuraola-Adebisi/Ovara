@@ -101,7 +101,7 @@ export default function NutritionPage() {
         <label className="field">Meal<select value={mealKind} onChange={event => setMealKind(event.target.value)}>{kinds.map(item => <option key={item}>{item}</option>)}</select></label>
         <label className="field">Date<input type="date" value={selectedDate} max={today} onChange={event => setSelectedDate(event.target.value)} required/></label>
         <label className="field">Time<input type="time" value={mealTime} onChange={event => setMealTime(event.target.value)} required/></label>
-        <label className="field">Energy in {preferences.energyUnit === 'kj' ? 'kJ' : 'kcal'} (optional)<input type="number" inputMode="numeric" min="0" max="50000" value={energy} onChange={event => setEnergy(event.target.value}/></label>
+        <label className="field">Energy in {preferences.energyUnit === 'kj' ? 'kJ' : 'kcal'} (optional)<input type="number" inputMode="numeric" min="0" max="50000" value={energy} onChange={event => setEnergy(event.target.value)}/></label>
         <label className="field">Notes (optional)<input value={description} onChange={event => setDescription(event.target.value)} placeholder="Ingredients, portion or how it felt"/></label>
       </div>
       <div className="btn-row"><button type="submit" className="btn btn-primary">{editingId === null ? 'Save food note' : 'Save changes'}</button><button type="button" className="btn btn-secondary" onClick={resetForm}>Cancel</button></div>
