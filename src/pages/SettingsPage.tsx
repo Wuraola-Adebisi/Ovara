@@ -101,7 +101,7 @@ export default function SettingsPage() {
       </Card>
 
       <Card title="Reminders">
-        <p className="muted">Reminders only appear while Ovara is open in a browser tab.</p>
+        <p className="muted">Reminders can notify you while Ovara is open in this browser. They do not run when the app is closed.</p>
         <div className="btn-row">
           <button type="button" className="btn btn-secondary" onClick={requestPermission} disabled={permission === 'granted' || permission === 'unsupported'}><Bell size={18} aria-hidden="true"/>{permission === 'granted' ? 'Notifications are on' : 'Allow notifications'}</button>
         </div>
@@ -115,7 +115,7 @@ export default function SettingsPage() {
             <div className="reminder-bottom">
               <input className="time-input" aria-label={'Time for ' + item.title} type="time" value={item.time} onChange={event => updateReminder(item.id, { time: event.target.value })}/>
               <div className="day-toggles" role="group" aria-label={'Days for ' + item.title}>
-                {dayNames.map((day, index) => <button type="button" key={day} aria-label={day} aria-pressed={item.days.includes(index)} onClick={() => updateReminder(item.id, { days: item.days.includes(index) ? item.days.filter(value => value !== index) : [...item.days, index] })}>{day[0]}</button>)}
+                {dayNames.map((day, index) => <button type="button" key={day} aria-label={day} title={day} aria-pressed={item.days.includes(index)} disabled={item.days.length === 1 && item.days.includes(index)} onClick={() => updateReminder(item.id, { days: item.days.includes(index) ? item.days.filter(value => value !== index) : [...item.days, index].sort((a, b) => a - b) })}>{day[0]}</button>)}
               </div>
             </div>
           </li>)}
