@@ -5,7 +5,7 @@ export default function PrivacyPage() {
   return <LegalPage
     title="Privacy"
     updated="19 November 2026"
-    intro="This page explains what the current version of Ovara stores, where it is stored and what happens when you use the website."
+    intro="This notice explains what information you add to Ovara, where it is kept and how you can manage it."
     sections={[
       { heading: 'Information you enter', body: <p>When you set up your space you enter a name and, if you choose, an email address, along with wellbeing goals and areas of interest. You can also add activity records (including optional distance), meal notes, water, routines and their completion history, moods, journal entries, goals, reminders and display preferences.</p> },
       { heading: 'Where your information is stored', body: <p>These details are saved in your browser's local storage on the device you use. They are not sent to an Ovara server. Summaries and patterns are calculated in your browser from your own entries. Ovara has no accounts, cloud backup or sync between devices, so anyone with access to your browser profile or device may be able to read this information. Avoid entering sensitive medical or other highly personal details. Reminder notifications need your permission and only appear while Ovara is open in a browser tab. The contact form prepares a message in your email app, and nothing is sent unless you send it.</p> },
