@@ -109,7 +109,8 @@ export default function SettingsPage() {
         <ul className="rows reminder-list">
           {reminders.map(item => <li className="reminder" key={item.id}>
             <div className="reminder-top">
-              <label className="switch"><input type="checkbox" checked={item.enabled} onChange={event => updateReminder(item.id, { enabled: event.target.checked })}/><span className="switch-track" aria-hidden="true"/><span className="switch-label">{item.title}</span></label>
+              <label className="switch" aria-label={'Enable ' + item.title}><input type="checkbox" checked={item.enabled} onChange={event => updateReminder(item.id, { enabled: event.target.checked })}/><span className="switch-track" aria-hidden="true"/></label>
+              <input className="reminder-name" aria-label="Reminder title" maxLength={80} value={item.title} onChange={event => updateReminder(item.id, { title: event.target.value })}/>
               <button type="button" className="icon-btn" aria-label={'Remove reminder ' + item.title} onClick={() => removeReminder(item.id, item.title)}><Trash2 size={18}/></button>
             </div>
             <div className="reminder-bottom">
