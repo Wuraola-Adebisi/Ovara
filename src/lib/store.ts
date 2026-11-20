@@ -67,7 +67,11 @@ export function importAllData(text: string, apply: boolean): { ok: true; keys: n
     });
     try {
       resetAllData();
-      validation.entries.forEach(([key, value]) => window.localStorage.setItem(key, JSON.stringify(value)));
+      validation.entries.forEach(([key, value]) => {
+        const serialised = JSON.stringify(value);
+        if (serialised === undefined) throw new Error('Invalid backup value');
+        window.localStorage.setItem(key, serialised);
+      });
     } catch {
       resetAllData();
       Object.entries(previous).forEach(([key, value]) => window.localStorage.setItem(key, value));
