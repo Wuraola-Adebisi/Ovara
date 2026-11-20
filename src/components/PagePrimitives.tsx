@@ -1,5 +1,27 @@
+import { useEffect } from 'react';
 import type { ReactNode } from 'react';
-import { Activity } from 'lucide-react';
-export function Header({tag,title,desc,action}:{tag:string,title:string,desc:string,action?:ReactNode}){return <div className="page-head"><div><label>{tag}</label><h1>{title}</h1><p>{desc}</p></div>{action}</div>}
-export function PanelTitle({tag,title,action}:{tag:string,title:string,action?:ReactNode}){return <div className="panel-title"><div><label>{tag}</label><h3>{title}</h3></div>{action}</div>}
-export function Metric({label,value,unit,note,icon:Icon,tone}:{label:string,value:string,unit?:string,note:string,icon:typeof Activity,tone:string}){return <article className="metric"><div className="metric-head">{label}<span className={'metric-icon '+tone}><Icon size={18}/></span></div><strong>{value}<small>{unit}</small></strong><p>{note}</p></article>}
+
+export function usePageTitle(title: string) {
+  useEffect(() => { document.title = title + ' | Ovara'; }, [title]);
+}
+
+export function PageHeader({ title, desc, action }: { title: string; desc?: string; action?: ReactNode }) {
+  usePageTitle(title);
+  return <header className="page-head"><div><h1>{title}</h1>{desc && <p>{desc}</p>}</div>{action && <div className="page-head-action">{action}</div>}</header>;
+}
+
+export function Card({ title, action, children, className = '' }: { title?: string; action?: ReactNode; children: ReactNode; className?: string }) {
+  return <section className={('card ' + className).trim()}>
+    {(title || action) && <div className="card-head">{title && <h2>{title}</h2>}{action}</div>}
+    {children}
+  </section>;
+}
+
+export function Meter({ value, max, label }: { value: number; max: number; label: string }) {
+  const percent = max > 0 ? Math.min(100, Math.round(value / max * 100)) : 0;
+  return <div className={percent >= 100 ? 'meter is-full' : 'meter'} role="progressbar" aria-label={label} aria-valuemin={0} aria-valuemax={100} aria-valuenow={percent}><i style={{ width: percent + '%' }}/></div>;
+}
+
+export function EmptyState({ title, body, action }: { title: string; body: string; action?: ReactNode }) {
+  return <div className="empty"><b>{title}</b><p>{body}</p>{action}</div>;
+}

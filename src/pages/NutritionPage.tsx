@@ -1,48 +1,72 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { usePersistentState } from '../hooks/usePersistentState';
-import type { Meal } from '../data/seed';
-import { Coffee, Droplets, Plus, Salad, Trash2, Utensils } from 'lucide-react';
-import { Header, PanelTitle, Metric } from '../components/PagePrimitives';
-import { defaultPreferences, localDate, type Preferences, type WaterEntry } from '../lib/wellbeing';
+import { useLocation } from 'react-router-dom';
+import { Plus, Trash2 } from 'lucide-react';
+import { useStore } from '../lib/store';
+import { useToday } from '../hooks/useToday';
+import { useUndoRemove } from '../hooks/useUndoRemove';
+import { useToast } from '../components/Toast';
+import { Card, EmptyState, PageHeader } from '../components/PagePrimitives';
+import WaterCard from '../components/WaterCard';
+import { displayToKcal, getMealDate, kcalToDisplay } from '../lib/wellbeing';
+
+const kinds = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
 
 export default function NutritionPage() {
-  const [meals, setMeals] = usePersistentState<Meal[]>('ovara.meals', []);
-  const [water, setWater] = usePersistentState('ovara.waterGlasses', 0);
-  const [waterDate, setWaterDate] = usePersistentState('ovara.waterDate', localDate());
-  const [waterLog, setWaterLog] = usePersistentState<WaterEntry[]>('ovara.waterLog', []);
-  const [preferences] = usePersistentState<Preferences>('ovara.preferences', defaultPreferences);
-  const [showForm, setShowForm] = useState(false);
+  const location = useLocation();
+  const today = useToday();
+  const toast = useToast();
+  const [meals, setMeals] = useStore('meals');
+  const [preferences] = useStore('preferences');
+  const remove = useUndoRemove(meals, setMeals);
+  const [showForm, setShowForm] = useState(Boolean((location.state as { add?: boolean } | null)?.add));
   const [mealName, setMealName] = useState('');
   const [mealKind, setMealKind] = useState('Breakfast');
   const [energy, setEnergy] = useState('');
-  const today = localDate();
-  useEffect(() => { if (waterDate !== today) { setWater(0); setWaterDate(today); } }, [waterDate, today, setWater, setWaterDate]);
-  const todayMeals = meals.filter(meal => !meal.date || meal.date === today);
-  const todayWaterMl = waterLog.filter(item => item.date === today).reduce((sum,item)=>sum+item.ml,0);
-  const todayGlasses = todayWaterMl ? Math.round(todayWaterMl / 250) : water;
-  const toDisplayEnergy = (value:number) => preferences.energyUnit === 'kj' ? Math.round(value * 4.184) : value;
-  const totalEnergy = todayMeals.reduce((sum, meal) => sum + toDisplayEnergy(meal.cal), 0);
+
+  const todayMeals = meals.filter(meal => getMealDate(meal) === today);
+  const energyTotal = todayMeals.reduce((sum, meal) => sum + kcalToDisplay(meal.cal, preferences.energyUnit), 0);
+
   function addMeal(event: FormEvent) {
     event.preventDefault();
-    setMeals(current => [...current, { id: Date.now(), name: mealName.trim(), kind: mealKind, time: new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }), cal: Math.max(0, Number(energy) || 0), desc: 'Added to your food notes', date: today }]);
+    if (!mealName.trim()) return;
+    setMeals(current => [...current, {
+      id: Date.now(), name: mealName.trim(), kind: mealKind, date: today, desc: '',
+      time: new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
+      // Stored as kcal whatever unit is shown, so switching units later never skews old entries.
+      cal: energy.trim() ? Math.max(0, displayToKcal(Number(energy) || 0, preferences.energyUnit)) : 0,
+    }]);
     setMealName(''); setEnergy(''); setShowForm(false);
+    toast.show('Food note saved');
   }
-  function addWater() {
-    setWaterLog(current=>[...current,{id:Date.now(),date:today,ml:250,time:new Date().toISOString()}]);
-    setWater(value=>value+1);
-  }
-  function resetWater() {
-    setWaterLog(current=>current.filter(item=>item.date!==today));
-    setWater(0);
-  }
-  const waterValue = preferences.waterUnit === 'oz' ? (todayGlasses * 250 / 29.5735).toFixed(1) : String(todayGlasses * 250);
-  const waterTarget = preferences.waterUnit === 'oz' ? (preferences.dailyWaterTargetMl / 29.5735).toFixed(0) : String(preferences.dailyWaterTargetMl);
+
   return <div className="stack">
-    <Header tag="FOOD & NOURISHMENT" title="Nourish yourself well." desc="Notice what you eat and drink, without turning food into a maths problem." action={<button className="btn dark" onClick={() => setShowForm(value => !value)}><Plus size={16}/> Add a meal</button>}/>
-    {showForm && <form className="panel activity-form" onSubmit={addMeal}><div className="panel-title"><div><label>A NOTE ABOUT YOUR FOOD</label><h3>What did you have?</h3></div><button type="button" className="btn outline small" onClick={() => setShowForm(false)}>Cancel</button></div><div className="form-grid"><label>Meal or food<input value={mealName} onChange={event => setMealName(event.target.value)} placeholder="e.g. Rice, vegetables and fish" required/></label><label>When<select value={mealKind} onChange={event => setMealKind(event.target.value)}><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option></select></label><label>Energy estimate (optional)<input type="number" min="0" max="10000" value={energy} onChange={event => setEnergy(event.target.value)} placeholder="Leave blank if you prefer"/></label></div><button className="btn dark" type="submit">Save food note</button></form>}
-    <section className="nutrition-hero"><div><label>YOUR FOOD NOTES</label><b>{todayMeals.length} <small>{todayMeals.length === 1 ? 'meal or snack noted today' : 'meals & snacks noted today'}</small></b><p>Food is nourishment, culture, pleasure and connection. Your notes can reflect that.</p></div><div className="nutrition-note"><span>Today</span><strong>{todayMeals.length ? 'You made a note.' : 'Start wherever you are.'}</strong></div></section>
-    <section className="metrics three"><Metric label="Meals & snacks" value={String(todayMeals.length)} note="Notes added today" icon={Utensils} tone="mint"/><Metric label="Water" value={waterValue} unit={preferences.waterUnit} note="Water logged today" icon={Salad} tone="lilac"/><Metric label="Energy estimates" value={totalEnergy ? totalEnergy.toLocaleString() : '—'} unit={totalEnergy ? preferences.energyUnit : ''} note="Optional, if useful to you" icon={Coffee} tone="peach"/></section>
-    <section className="two-col nutrition-cols"><article className="panel"><PanelTitle tag="WHAT YOU'VE HAD" title="Today's food notes"/>{todayMeals.length ? todayMeals.map(meal => <div className="meal" key={meal.id}><span className="metric-icon mint">{meal.kind === 'Breakfast' ? <Coffee size={18}/> : <Salad size={18}/>}</span><span><b>{meal.name}</b><small>{meal.kind} · {meal.time}</small><small>{meal.desc}</small></span>{meal.cal > 0 && <strong>{toDisplayEnergy(meal.cal)}<small>{preferences.energyUnit}</small></strong>}<button aria-label={'Delete ' + meal.name} className="icon-button" onClick={() => setMeals(current => current.filter(item => item.id !== meal.id))}><Trash2 size={14}/></button></div>) : <div className="empty-state"><span className="metric-icon peach"><Utensils size={19}/></span><b>Your food notes will live here.</b><p>Add a meal or snack whenever you feel like keeping track.</p><button className="btn outline small" onClick={() => setShowForm(true)}>Add your first note <Plus size={14}/></button></div>}</article><article className="panel"><PanelTitle tag="STAY HYDRATED" title="Water check-in"/><div className="water-total"><b>{waterValue}</b><span> / {waterTarget} {preferences.waterUnit}</span></div><div className="water-drops">{Array.from({ length: Math.min(12, Math.max(8, Math.ceil(preferences.dailyWaterTargetMl / 250))) }, (_, index) => <span className={index < todayGlasses ? 'filled' : ''} key={index}><Droplets size={15}/></span>)}</div><div className="water-foot"><span>{todayGlasses} glasses logged</span><button className="btn outline small" onClick={addWater}><Plus size={13}/> Add a glass</button></div><button className="text-link water-reset" onClick={resetWater}>Reset today's count</button></article></section>
+    <PageHeader title="Food and water" desc="Note what you eat and drink. Energy estimates are optional." action={<button type="button" className="btn btn-primary" aria-expanded={showForm} onClick={() => setShowForm(value => !value)}><Plus size={18} aria-hidden="true"/>Add a meal</button>}/>
+
+    {showForm && <form className="card form-card" onSubmit={addMeal}>
+      <div className="card-head"><h2>Add a food note</h2></div>
+      <div className="form-grid">
+        <label className="field">What did you have?<input value={mealName} onChange={event => setMealName(event.target.value)} placeholder="Rice, vegetables and fish" required autoComplete="off"/></label>
+        <label className="field">Meal<select value={mealKind} onChange={event => setMealKind(event.target.value)}>{kinds.map(item => <option key={item}>{item}</option>)}</select></label>
+        <label className="field">Energy in {preferences.energyUnit === 'kj' ? 'kJ' : 'kcal'} (optional)<input type="number" inputMode="numeric" min="0" max="50000" value={energy} onChange={event => setEnergy(event.target.value)}/></label>
+      </div>
+      <div className="btn-row"><button type="submit" className="btn btn-primary">Save food note</button><button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Cancel</button></div>
+    </form>}
+
+    <div className="grid-2">
+      <Card title="Today's food notes">
+        {todayMeals.length === 0 ? <EmptyState title="No food notes today" body="Add a meal or snack when you want to keep a record." action={<button type="button" className="btn btn-secondary" onClick={() => setShowForm(true)}>Add a note</button>}/> : <>
+          <ul className="rows">
+            {todayMeals.map(meal => <li className="row" key={meal.id}>
+              <div className="row-main"><b>{meal.name}</b><small>{meal.kind}, {meal.time}</small></div>
+              {meal.cal > 0 && <div className="row-side"><b>{kcalToDisplay(meal.cal, preferences.energyUnit).toLocaleString()}</b><small>{preferences.energyUnit === 'kj' ? 'kJ' : 'kcal'}</small></div>}
+              <button type="button" className="icon-btn" aria-label={'Remove ' + meal.name} onClick={() => remove(meal.id, meal.name)}><Trash2 size={18}/></button>
+            </li>)}
+          </ul>
+          {energyTotal > 0 && <p className="muted">Energy you chose to record today: {energyTotal.toLocaleString()} {preferences.energyUnit === 'kj' ? 'kJ' : 'kcal'}. There is no target.</p>}
+        </>}
+      </Card>
+      <WaterCard/>
+    </div>
   </div>;
 }

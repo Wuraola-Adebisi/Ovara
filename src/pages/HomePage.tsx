@@ -1,17 +1,95 @@
 import { Link } from 'react-router-dom';
-import { ArrowDown, ArrowRight, ArrowUpRight, Check, Heart, Leaf, MoveUpRight, Sprout } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import { usePageTitle } from '../components/PagePrimitives';
 
-const movementImage = 'https://images.pexels.com/photos/8539045/pexels-photo-8539045.jpeg?auto=compress&cs=tinysrgb&w=1100';
-const foodImage = 'https://images.pexels.com/photos/6823369/pexels-photo-6823369.jpeg?auto=compress&cs=tinysrgb&w=900';
-const calmImage = 'https://images.pexels.com/photos/2908175/pexels-photo-2908175.jpeg?auto=compress&cs=tinysrgb&w=1100';
+const features = [
+  ['Activity', 'Log walks, workouts and stretches with duration, steps and distance. A weekly chart shows how your days compare with your step target.'],
+  ['Food and water', 'Note what you ate and count glasses of water. Energy estimates are optional and there is no calorie goal.'],
+  ['Routines', 'Make a short list of things you want to do regularly and tick them off each day. Your history stays after the list resets.'],
+  ['Journal', 'Pick a mood and write a few lines once a day. Past entries are kept in a simple list.'],
+  ['Goals', 'Set a daily, weekly or monthly target for steps, active time, water, routines or journal entries and watch progress fill in.'],
+  ['Insights and calendar', 'See totals for the week or month, and open any day on the calendar to see everything you logged.'],
+] as const;
+
+const steps = [
+  ['Set up in a minute', 'Enter a name and pick the areas you want to track. There is no account and no password.'],
+  ['Log as you go', 'Add a walk, a glass of water or a mood from any page. Entries save on your device straight away.'],
+  ['Look back', 'Charts, goals and the calendar show what you logged. Download everything as a file whenever you like.'],
+] as const;
+
+const principles = [
+  ['No required calorie target', 'Energy estimates are optional. Ovara never tells you how much to eat.'],
+  ['Your data stays on your device', 'There is no server holding your entries, so only people with access to your browser can read them.'],
+  ['Use only what you need', 'Choose the areas you care about and the Today page leads with them. Every other page stays one tap away.'],
+  ['Not medical care', 'Ovara is for everyday notes. It cannot diagnose or treat anything.'],
+] as const;
+
+const faq = [
+  ['What can I keep track of?', 'Activity, meals, water, routines, mood and a daily journal entry. You can set goals for most of them.'],
+  ['Where is my data stored?', 'In your browser on the device you use. Ovara has no accounts and does not send your entries anywhere.'],
+  ['Can I use it on a second device?', 'Not yet. You can download your data as a file from the Preferences page, but importing that file on another device is not built.'],
+  ['Is this a medical or fitness programme?', 'No. It is a personal log. It does not give medical advice or a training plan.'],
+] as const;
 
 export default function HomePage() {
-  return <main className="home-page">
-    <section className="home-hero"><div className="hero-copy-home"><span className="eyebrow"><i/> A MORE WHOLE WAY TO WELLBEING</span><h1>Feel good in<br/>your <em>own</em> way.</h1><p>Wellbeing isn't one perfect routine or a number to chase. It's the little things that help you feel more like yourself, brought together in one thoughtful space.</p><div className="hero-actions"><Link to="/app" className="button-primary">Find your rhythm <ArrowUpRight size={17}/></Link><a href="#how-it-works" className="text-action">Get to know Ovara <ArrowDown size={15}/></a></div><div className="hero-footnote"><span className="tiny-leaves"><Leaf size={14}/><Leaf size={14}/><Leaf size={14}/></span><span>For real life, at your pace.</span></div></div><div className="hero-visual"><img className="hero-photo" src={calmImage} alt="Woman taking a quiet moment outdoors"/><div className="hero-photo-label"><span>01 / YOUR WHOLE SELF</span><b>There is no one way<br/>to feel well.</b></div><div className="hero-stamp"><Sprout size={21}/><span>GROW AT<br/>YOUR PACE</span></div><div className="hero-orbit-note"><span className="note-dot"/><span>A little more<br/><b>in balance.</b></span></div></div></section>
-    <div className="ticker"><span>MOVE WITH INTENTION</span><i>✳</i><span>EAT WITH EASE</span><i>✳</i><span>MAKE SPACE TO REST</span><i>✳</i><span>NOTICE HOW YOU FEEL</span><i>✳</i><span>MOVE WITH INTENTION</span></div>
-    <section className="intro-section" id="how-it-works"><div className="section-kicker">01 — THE BIGGER PICTURE</div><div className="intro-grid"><h2>Your wellbeing<br/>is <em>connected.</em></h2><div><p className="intro-lead">How you move affects how you feel. What you eat shapes your energy. Rest changes everything.</p><p className="intro-body">But keeping track of it all can feel scattered. Ovara brings the everyday pieces together, so you can pay attention to the patterns that matter to you, without turning your life into another project.</p><Link to="/about" className="underlined-link">A little more about us <ArrowUpRight size={15}/></Link></div></div></section>
-    <section className="pillars-section"><div className="section-kicker">02 — THE EVERYDAY THINGS</div><div className="pillars-heading"><h2>Care looks different<br/>from one day to the next.</h2><p>Some days call for movement. Others call for a proper meal, a slower morning, or simply checking in with yourself.</p></div><div className="pillar-grid"><article className="pillar-card pillar-movement"><div className="pillar-image"><img src={movementImage} alt="Woman stretching outdoors on a yoga mat" loading="lazy"/><span className="image-index">01</span></div><div className="pillar-text"><div><span>MOVE</span><h3>Find movement<br/>that feels good.</h3></div><p>Keep a record of walks, workouts and the small ways you get moving.</p></div></article><article className="pillar-card pillar-food"><div className="pillar-image"><img src={foodImage} alt="Fresh fruit and yoghurt bowls" loading="lazy"/><span className="image-index">02</span></div><div className="pillar-text"><div><span>NOURISH</span><h3>Make room for<br/>good nourishment.</h3></div><p>Notice your meals and hydration without making food feel like a maths problem.</p></div></article><article className="pillar-card pillar-rest"><div className="pillar-image"><img src={calmImage} alt="A quiet moment of meditation in nature" loading="lazy"/><span className="image-index">03</span></div><div className="pillar-text"><div><span>RECONNECT</span><h3>Pay attention to<br/>how you feel.</h3></div><p>Build routines, reflect on your days and make space for the things that restore you.</p></div></article></div></section>
-    <section className="manifesto"><div className="manifesto-image"><img src={movementImage} alt="A person stretching in a green park" loading="lazy"/></div><div className="manifesto-copy"><span className="eyebrow light-eyebrow">A NOTE TO YOURSELF</span><h2>You don't have<br/>to do it <em>all.</em></h2><p>You just need a place to begin, room to change your mind, and a way to notice the progress you might otherwise miss.</p><Link to="/app" className="button-light">Make space for yourself <ArrowUpRight size={16}/></Link><span className="manifesto-flower"><Heart size={25}/></span></div></section>
-    <section className="faq-section"><div className="section-kicker">A FEW THINGS YOU MIGHT BE WONDERING</div><div className="faq-grid"><h2>Good to<br/><em>know.</em></h2><div className="faq-list"><details><summary>What can I keep track of in Ovara?</summary><p>Movement, meals, water, everyday routines and personal reflections. You can use the parts that matter to you and leave the rest.</p></details><details><summary>Do I need a strict routine to use it?</summary><p>Not at all. Ovara is designed to make room for changing schedules, different energy levels and the fact that no two days look exactly alike.</p></details><details><summary>Is Ovara a medical or fitness programme?</summary><p>No. It is a personal wellbeing space for everyday notes and self-reflection, not a medical service or a prescribed fitness plan.</p></details></div></div></section>\n    <section className="closing-section"><div className="section-kicker">03 — START WHERE YOU ARE</div><h2>A little care adds up<br/>to a <em>life well lived.</em></h2><p>Make a space for the habits, choices and moments that make you feel more like you.</p><Link to="/app" className="button-primary">Come on in <ArrowRight size={17}/></Link><span className="closing-leaf"><Leaf size={72}/></span></section>
+  usePageTitle('Feel good in your own way');
+  return <main id="main">
+    <section className="hero">
+      <div className="container hero-grid">
+        <div className="hero-copy">
+          <h1>Feel good in your own way.</h1>
+          <p>Ovara is a daily tracker for movement, food, water, routines and mood. It keeps your entries on your device and does not ask you to hit a calorie target.</p>
+          <div className="btn-row">
+            <Link to="/app" className="btn btn-primary btn-lg">Open your space<ArrowRight size={20} aria-hidden="true"/></Link>
+            <Link to="/#how-it-works" className="btn btn-secondary btn-lg">How it works</Link>
+          </div>
+        </div>
+        <div className="hero-visual" aria-hidden="true">
+          <div className="preview">
+            <div className="preview-head"><b>Today so far</b><span>Example</span></div>
+            <div className="glance-row"><div className="glance-top"><span>Steps</span><b>6,240<small> of 7,000</small></b></div><div className="meter"><i style={{ width: '89%' }}/></div></div>
+            <div className="glance-row"><div className="glance-top"><span>Water</span><b>1.5<small> of 2 L</small></b></div><div className="meter"><i style={{ width: '75%' }}/></div></div>
+            <div className="glance-row"><div className="glance-top"><span>Routines</span><b>3<small> of 4</small></b></div><div className="meter"><i style={{ width: '75%' }}/></div></div>
+            <div className="preview-mood"><span>Mood</span><b>Good</b></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section className="section">
+      <div className="container">
+        <h2 className="section-title">What Ovara keeps track of</h2>
+        <dl className="feature-list">{features.map(([title, body]) => <div key={title}><dt>{title}</dt><dd>{body}</dd></div>)}</dl>
+      </div>
+    </section>
+
+    <section className="section band" id="how-it-works">
+      <div className="container">
+        <h2 className="section-title">How it works</h2>
+        <ol className="steps">{steps.map(([title, body], index) => <li key={title}><span className="step-number">{index + 1}</span><h3>{title}</h3><p>{body}</p></li>)}</ol>
+      </div>
+    </section>
+
+    <section className="section">
+      <div className="container">
+        <h2 className="section-title">What Ovara does differently</h2>
+        <dl className="principles">{principles.map(([title, body]) => <div key={title}><dt>{title}</dt><dd>{body}</dd></div>)}</dl>
+      </div>
+    </section>
+
+    <section className="section band">
+      <div className="container faq-grid">
+        <h2 className="section-title">Questions</h2>
+        <div className="faq-list">{faq.map(([question, answer]) => <details key={question}><summary>{question}</summary><p>{answer}</p></details>)}</div>
+      </div>
+    </section>
+
+    <section className="section">
+      <div className="container cta-block">
+        <h2>Start with today.</h2>
+        <p>Set up takes about a minute and you can change everything later.</p>
+        <Link to="/app" className="btn btn-primary btn-lg">Open your space<ArrowRight size={20} aria-hidden="true"/></Link>
+      </div>
+    </section>
   </main>;
 }

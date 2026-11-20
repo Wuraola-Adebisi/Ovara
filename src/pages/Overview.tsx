@@ -1,54 +1,112 @@
-import { useEffect } from 'react';
-import { usePersistentState } from '../hooks/usePersistentState';
-import { habitsSeed, type ActivityRecord } from '../data/seed';
 import { Link } from 'react-router-dom';
-import { Activity, ArrowUpRight, Check, ChevronRight, Clock3, Droplets, Footprints, Heart, Plus, Target, Wind } from 'lucide-react';
-import { Header, PanelTitle, Metric } from '../components/PagePrimitives';
-import { defaultPreferences, localDate, type JournalEntry, type Preferences, type RoutineCompletion, type WaterEntry } from '../lib/wellbeing';
+import { ArrowRight, Plus } from 'lucide-react';
+import { useStore } from '../lib/store';
+import { useProfile } from '../context/ProfileContext';
+import { useToday } from '../hooks/useToday';
+import { Card, Meter, PageHeader } from '../components/PagePrimitives';
+import BarChart from '../components/BarChart';
+import MoodPicker from '../components/MoodPicker';
+import WaterCard from '../components/WaterCard';
+import { GLASS_ML, formatDay, formatWater, getMealDate, greetingFor, lastDays, sumFor } from '../lib/wellbeing';
 
 export default function Overview() {
-  const [habits,setHabits]=usePersistentState('ovara.habits',habitsSeed);
-  const [habitsDate,setHabitsDate]=usePersistentState('ovara.habitsDate',localDate());
-  const [water,setWater]=usePersistentState('ovara.waterGlasses',0);
-  const [waterDate,setWaterDate]=usePersistentState('ovara.waterDate',localDate());
-  const [waterLog,setWaterLog]=usePersistentState<WaterEntry[]>('ovara.waterLog',[]);
-  const [mood,setMood]=usePersistentState('ovara.dailyMood','');
-  const [journals,setJournals]=usePersistentState<JournalEntry[]>('ovara.journalEntries',[]);
-  const [completions,setCompletions]=usePersistentState<RoutineCompletion[]>('ovara.routineCompletions',[]);
-  const [preferences]=usePersistentState<Preferences>('ovara.preferences',defaultPreferences);
-  const [activities]=usePersistentState<ActivityRecord[]>('ovara.activities',[]);
-  const todayKey=localDate();
-  useEffect(()=>{if(habitsDate!==todayKey){setHabits(old=>old.map(item=>({...item,done:false})));setHabitsDate(todayKey);}if(waterDate!==todayKey){setWater(0);setWaterDate(todayKey);}},[habitsDate,waterDate,todayKey,setHabits,setHabitsDate,setWater,setWaterDate]);
-  const done=habits.filter(h=>h.done).length;
-  const todayActivities=activities.filter(entry=>entry.date===todayKey);
-  const todaySteps=todayActivities.reduce((sum,entry)=>sum+entry.steps,0);
-  const todayMinutes=todayActivities.reduce((sum,entry)=>sum+entry.minutes,0);
-  const todayWaterMl=waterLog.filter(item=>item.date===todayKey).reduce((sum,item)=>sum+item.ml,0);
-  const todayGlasses=todayWaterMl ? Math.round(todayWaterMl/250) : water;
-  const waterMlValue=todayWaterMl||todayGlasses*250;
-  const waterDisplayValue=preferences.waterUnit==='oz'?(waterMlValue/29.5735).toFixed(1):String(waterMlValue);
-  const waterDisplayTarget=preferences.waterUnit==='oz'?(preferences.dailyWaterTargetMl/29.5735).toFixed(0):String(preferences.dailyWaterTargetMl);
-  const days=Array.from({length:7},(_,i)=>{const date=new Date();date.setDate(date.getDate()-(6-i));const key=localDate(date);return [date.toLocaleDateString(undefined,{weekday:'short'}),activities.filter(entry=>entry.date===key).reduce((sum,entry)=>sum+entry.steps,0)] as [string,number]});
-  function toggleHabit(id:number,title:string,wasDone:boolean) {
-    setHabits(old=>old.map(x=>x.id===id?{...x,done:!x.done}:x));
-    if(wasDone) setCompletions(old=>old.filter(item=>!(item.routineId===id&&item.date===todayKey)));
-    else setCompletions(old=>[...old,{id:Date.now(),date:todayKey,routineId:id,title}]);
+  const { profile } = useProfile();
+  const today = useToday();
+  const [habits] = useStore('habits');
+  const [completions, setCompletions] = useStore('completions');
+  const [water] = useStore('water');
+  const [activities] = useStore('activities');
+  const [meals] = useStore('meals');
+  const [journals, setJournals] = useStore('journals');
+  const [preferences] = useStore('preferences');
+
+  // Areas picked during setup decide which sections lead. With none picked, show everything.
+  const interests = profile?.interests ?? [];
+  const shows = (...areas: string[]) => interests.length === 0 || areas.some(area => interests.includes(area));
+
+  const doneIds = new Set(completions.filter(item => item.date === today).map(item => item.routineId));
+  const doneCount = habits.filter(habit => doneIds.has(habit.id)).length;
+  const steps = sumFor(activities, today, item => item.steps);
+  const minutes = sumFor(activities, today, item => item.minutes);
+  const waterMl = sumFor(water, today, item => item.ml);
+  const foodCount = meals.filter(meal => getMealDate(meal) === today).length;
+  const waterNow = formatWater(waterMl, preferences.waterUnit);
+  const waterGoal = formatWater(preferences.dailyWaterTargetMl, preferences.waterUnit);
+  const todayEntry = journals.find(entry => entry.date === today);
+  const week = lastDays(7).map(({ key, date }) => ({
+    key, label: date.toLocaleDateString(undefined, { weekday: 'short' }),
+    fullLabel: date.toLocaleDateString(undefined, { weekday: 'long' }),
+    value: sumFor(activities, key, item => item.steps), highlight: key === today,
+  }));
+  const weekAverage = Math.round(week.reduce((sum, day) => sum + day.value, 0) / 7);
+
+  function toggleHabit(id: number, title: string) {
+    if (doneIds.has(id)) setCompletions(current => current.filter(item => !(item.routineId === id && item.date === today)));
+    else setCompletions(current => [...current, { id: Date.now(), date: today, routineId: id, title }]);
   }
-  function addWater() {
-    setWaterLog(old=>[...old,{id:Date.now(),date:todayKey,ml:250,time:new Date().toISOString()}]);
-    setWater(v=>v+1);
+  // Picking a mood here updates today's entry and keeps any note already written in the journal.
+  function saveMood(mood: string) {
+    setJournals(current => todayEntry
+      ? current.map(entry => entry.id === todayEntry.id ? { ...entry, mood } : entry)
+      : [{ id: Date.now(), date: today, mood, note: '', createdAt: new Date().toISOString() }, ...current]);
   }
-  function saveMood(value:string) {
-    setMood(value);
-    setJournals(old=>[{id:Date.now(),date:todayKey,mood:value,note:'',createdAt:new Date().toISOString()},...old.filter(item=>item.date!==todayKey)]);
-  }
+
   return <div className="stack">
-    <Header tag="YOUR DAY, YOUR PACE" title="A little progress goes a long way." desc="Here's how your day is taking shape. Make it yours." action={<button className="btn dark" onClick={()=>window.dispatchEvent(new Event('ovara:add'))}><Plus size={16}/> Add an entry</button>}/>
-    <section className="hero"><div className="hero-copy"><label><Heart size={13}/> YOUR DAILY CHECK-IN</label><h2>Make today count,<br/><em>at your own pace.</em></h2><p>There is no perfect routine. Just the small things that help you feel more like yourself.</p><Link className="btn light" to="/app/routines">View your routines <ArrowUpRight size={15}/></Link></div><div className="hero-orbit"><div><Wind size={42}/></div><i>•</i></div></section>
-    <div className="section-head"><div><label>YOUR DAY</label><h2>The overview</h2></div><span>Today</span></div>
-    <section className="metrics"><Metric label="Steps" value={todaySteps.toLocaleString()} note={"Daily target: "+preferences.dailyStepTarget.toLocaleString()} icon={Footprints} tone="mint"/><Metric label="Active time" value={String(todayMinutes)} unit="min" note="Movement logged today" icon={Clock3} tone="lilac"/><Metric label="Water" value={waterDisplayValue} unit={preferences.waterUnit} note={"Goal: "+waterDisplayTarget+" "+preferences.waterUnit} icon={Droplets} tone="peach"/><Metric label="Routines" value={done+'/'+habits.length} note="A few more to go" icon={Target} tone="butter"/></section>
-    <section className="two-col"><article className="panel"><PanelTitle tag="KEEP MOVING" title="Your activity" action={<Link className="text-link" to="/app/activity">View activity <ChevronRight size={14}/></Link>}/><div className="chart-total"><b>{Math.round(days.reduce((sum,day)=>sum+day[1],0)/7).toLocaleString()}</b><span>average steps this week</span></div><div className="bars">{days.map(([day,num],i)=><div className="bar-col" key={i}><div className="bar-bg"><i style={{height:(Number(num)/Math.max(11000,...days.map(d=>d[1]))*100)+'%'}} className={i===6?'current':''}/></div><small>{day}</small></div>)}</div><div className="chart-foot"><span>● Steps</span><span>Daily movement, not a competition.</span></div></article><article className="panel"><PanelTitle tag="SHOW UP FOR YOU" title="Today's routines" action={<Link className="round-link" to="/app/routines"><ArrowUpRight size={16}/></Link>}/><div className="progress-line"><i style={{width:(habits.length?done/habits.length*100:0)+'%'}}/></div><div className="habit-list">{habits.slice(0,4).map(h=><button className="habit" key={h.id} onClick={()=>toggleHabit(h.id,h.title,h.done)}><span className={h.done?'check checked':'check'}>{h.done&&<Check size={12}/>}</span><span><b>{h.title}</b><small>{h.time}</small></span><ChevronRight size={14}/></button>)}</div><Link className="bottom-link" to="/app/routines">See all routines <ArrowUpRight size={14}/></Link></article></section>
-    <section className="two-col"><article className="panel"><PanelTitle tag="A LITTLE HYDRATION" title="Water check-in" action={<span className="metric-icon peach"><Droplets size={17}/></span>}/><div className="water-total"><b>{waterDisplayValue}</b><span> / {waterDisplayTarget} {preferences.waterUnit}</span></div><div className="water-drops">{Array.from({length:Math.min(12,Math.max(8,Math.ceil(preferences.dailyWaterTargetMl/250)))},(_,i)=><span className={i<todayGlasses?'filled':''} key={i}><Droplets size={16}/></span>)}</div><div className="water-foot"><span>{todayGlasses} glasses logged</span><button className="btn outline small" onClick={addWater}><Plus size={13}/> Add glass</button></div></article><article className="panel"><PanelTitle tag="PAUSE FOR A MOMENT" title="A quick reflection" action={<span className="metric-icon lilac"><Heart size={17}/></span>}/><p className="prompt">How are you feeling about today so far?</p><div className="moods">{['Not great','A little low','Okay','Good','Great'].map((m,i)=><button onClick={()=>saveMood(m)} className={mood===m?'chosen':''} key={m}><span>{['☁','◒','◉','☀','♥'][i]}</span><small>{m}</small></button>)}</div><Link className="bottom-link" to="/app/journal">Open your journal <ArrowUpRight size={14}/></Link></article></section>
-    <section className="insight-shortcut"><div><label>YOUR PATTERNS</label><h3>See how your days are adding up.</h3><p>Explore your history, goals and personal insights.</p></div><div><Link className="btn outline small" to="/app/insights">View insights</Link><Link className="btn outline small" to="/app/goals">Your goals</Link><Link className="btn outline small" to="/app/calendar">Open calendar</Link></div></section>
+    <PageHeader
+      title={greetingFor() + ', ' + (profile?.name.split(' ')[0] ?? '')}
+      desc={formatDay(today, { weekday: 'long', day: 'numeric', month: 'long' })}
+      action={<button type="button" className="btn btn-primary" onClick={() => window.dispatchEvent(new Event('ovara:add'))}><Plus size={18} aria-hidden="true"/>Add</button>}
+    />
+
+    {profile && profile.goals.length > 0 && <p className="focus-line"><span>Your focus</span>{profile.goals.map(goal => <b className="chip" key={goal}>{goal}</b>)}</p>}
+
+    <Card title="Today so far">
+      <div className="glance">
+        {shows('Movement') && <div className="glance-row">
+          <div className="glance-top"><span>Steps</span><b>{steps.toLocaleString()}<small> of {preferences.dailyStepTarget.toLocaleString()}</small></b></div>
+          <Meter value={steps} max={preferences.dailyStepTarget} label="Steps toward today's target"/>
+        </div>}
+        {shows('Movement') && <div className="glance-row">
+          <div className="glance-top"><span>Active time</span><b>{minutes}<small> min</small></b></div>
+        </div>}
+        {shows('Hydration', 'Nutrition') && <div className="glance-row">
+          <div className="glance-top"><span>Water</span><b>{waterNow.value}<small> of {waterGoal.value} {waterGoal.unit}</small></b></div>
+          <Meter value={waterMl} max={preferences.dailyWaterTargetMl} label="Water toward today's target"/>
+        </div>}
+        {shows('Routines') && <div className="glance-row">
+          <div className="glance-top"><span>Routines</span><b>{doneCount}<small> of {habits.length}</small></b></div>
+          <Meter value={doneCount} max={habits.length} label="Routines done today"/>
+        </div>}
+        {shows('Nutrition') && <div className="glance-row">
+          <div className="glance-top"><span>Food notes</span><b>{foodCount}<small> today</small></b></div>
+        </div>}
+      </div>
+    </Card>
+
+    <div className="grid-2">
+      {shows('Routines') && <Card title="Routines" action={<Link className="text-link" to="/app/routines">All routines <ArrowRight size={16} aria-hidden="true"/></Link>}>
+        {habits.length === 0 ? <p className="muted">No routines yet. Add one on the routines page.</p> : <ul className="check-list">
+          {habits.slice(0, 6).map(habit => <li key={habit.id}>
+            <label className="check-row">
+              <input type="checkbox" checked={doneIds.has(habit.id)} onChange={() => toggleHabit(habit.id, habit.title)}/>
+              <span className="check-box" aria-hidden="true"/>
+              <span className="check-text"><b>{habit.title}</b><small>{habit.time}</small></span>
+            </label>
+          </li>)}
+        </ul>}
+      </Card>}
+
+      {shows('Hydration', 'Nutrition') && <WaterCard/>}
+    </div>
+
+    <div className="grid-2">
+      {shows('Movement') && <Card title="Steps this week" action={<Link className="text-link" to="/app/activity">Activity <ArrowRight size={16} aria-hidden="true"/></Link>}>
+        <p className="muted">Average {weekAverage.toLocaleString()} a day</p>
+        <BarChart bars={week} unit="steps" target={preferences.dailyStepTarget}/>
+      </Card>}
+      {shows('Reflection') && <Card title="Check in" action={<Link className="text-link" to="/app/journal">Journal <ArrowRight size={16} aria-hidden="true"/></Link>}>
+        <MoodPicker name="overview-mood" legend="How are you feeling today?" value={todayEntry?.mood ?? ''} onChange={saveMood}/>
+      </Card>}
+    </div>
   </div>;
 }

@@ -1,48 +1,143 @@
 import { useState } from 'react';
-import { Bell, Check, Droplets, Footprints, Settings2 } from 'lucide-react';
-import { Header, PanelTitle } from '../components/PagePrimitives';
-import { usePersistentState } from '../hooks/usePersistentState';
-import { defaultPreferences, type Preferences, type WellbeingReminder } from '../lib/wellbeing';
+import type { FormEvent } from 'react';
+import { Bell, Download, Trash2 } from 'lucide-react';
+import { exportAllData, resetAllData, useStore } from '../lib/store';
+import { useProfile } from '../context/ProfileContext';
+import { useUndoRemove } from '../hooks/useUndoRemove';
+import { useToast } from '../components/Toast';
+import ConfirmDialog from '../components/ConfirmDialog';
+import { Card, PageHeader } from '../components/PagePrimitives';
+import type { Preferences, WellbeingReminder } from '../lib/types';
 
-const starterReminders: WellbeingReminder[] = [
-  { id: 1, title: 'Time for a glass of water', kind: 'hydration', time: '10:00', enabled: false, days: [0,1,2,3,4,5,6] },
-  { id: 2, title: 'Take a mindful pause', kind: 'routine', time: '14:00', enabled: false, days: [1,2,3,4,5] },
-  { id: 3, title: 'Check in with yourself', kind: 'reflection', time: '20:00', enabled: false, days: [0,1,2,3,4,5,6] },
-];
+const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 export default function SettingsPage() {
-  const [preferences, setPreferences] = usePersistentState<Preferences>('ovara.preferences', defaultPreferences);
-  const [reminders, setReminders] = usePersistentState<WellbeingReminder[]>('ovara.reminders', starterReminders);
-  const [permission, setPermission] = useState(typeof Notification === 'undefined' ? 'unsupported' : Notification.permission);
+  const { profile, setProfile } = useProfile();
+  const toast = useToast();
+  const [preferences, setPreferences] = useStore('preferences');
+  const [reminders, setReminders] = useStore('reminders');
+  const removeReminder = useUndoRemove(reminders, setReminders);
+  const [permission, setPermission] = useState<NotificationPermission | 'unsupported'>(typeof Notification === 'undefined' ? 'unsupported' : Notification.permission);
   const [notice, setNotice] = useState('');
-  const [newReminderTitle, setNewReminderTitle] = useState('');
-  const [newReminderTime, setNewReminderTime] = useState('09:00');
-  async function enableNotifications() {
-    if (typeof Notification === 'undefined') { setNotice('This browser does not support notifications.'); return; }
+  const [reminderTitle, setReminderTitle] = useState('');
+  const [reminderTime, setReminderTime] = useState('09:00');
+  const [confirmReset, setConfirmReset] = useState(false);
+  const [name, setName] = useState(profile?.name ?? '');
+  const [email, setEmail] = useState(profile?.email ?? '');
+
+  const setPref = <K extends keyof Preferences>(key: K, value: Preferences[K]) => setPreferences(current => ({ ...current, [key]: value }));
+  const clampNumber = (raw: string, min: number, max: number) => Math.min(max, Math.max(min, Number(raw) || min));
+
+  function saveProfile(event: FormEvent) {
+    event.preventDefault();
+    if (!name.trim()) return;
+    setProfile(current => current ? { ...current, name: name.trim(), email: email.trim().toLowerCase() } : current);
+    toast.show('Profile saved');
+  }
+
+  async function requestPermission() {
+    if (typeof Notification === 'undefined') { setNotice('This browser does not support notifications.'); return 'unsupported' as const; }
     const result = await Notification.requestPermission();
     setPermission(result);
-    setNotice(result === 'granted' ? 'Notifications are enabled for this browser.' : 'Notification permission was not granted.');
+    setNotice(result === 'granted' ? 'Notifications are on for this browser.' : 'Notifications were not allowed, so reminders will not appear. You can change this in your browser settings.');
+    return result;
   }
-  function addReminder() {
-    if (!newReminderTitle.trim()) return;
-    setReminders(items => [...items, { id: Date.now(), title: newReminderTitle.trim(), kind: 'custom', time: newReminderTime, enabled: false, days: [0,1,2,3,4,5,6] }]);
-    setNewReminderTitle('');
-  }
-  function updateReminder(id: number, patch: Partial<WellbeingReminder>) {
+
+  async function updateReminder(id: number, patch: Partial<WellbeingReminder>) {
+    // A reminder that can never show is worse than no reminder, so ask for permission when one is switched on.
+    if (patch.enabled && permission !== 'granted') {
+      const result = await requestPermission();
+      if (result !== 'granted') return;
+    }
     setReminders(items => items.map(item => item.id === id ? { ...item, ...patch } : item));
   }
+
+  function addReminder(event: FormEvent) {
+    event.preventDefault();
+    if (!reminderTitle.trim()) return;
+    setReminders(items => [...items, { id: Date.now(), title: reminderTitle.trim(), kind: 'custom', time: reminderTime, enabled: false, days: [0, 1, 2, 3, 4, 5, 6] }]);
+    setReminderTitle('');
+  }
+
+  function download() {
+    const blob = new Blob([exportAllData()], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'ovara-data-' + new Date().toISOString().slice(0, 10) + '.json';
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function reset() {
+    resetAllData();
+    window.location.assign('/app');
+  }
+
   return <div className="stack">
-    <Header tag="MAKE OVARA YOURS" title="Your preferences." desc="Set the units, targets and gentle reminders that work for your day."/>
-    <section className="settings-grid">
-      <article className="panel"><PanelTitle tag="HOW YOU TRACK" title="Your preferences"/><div className="settings-fields">
-        <label>Distance units<select value={preferences.distanceUnit} onChange={e => setPreferences(p => ({ ...p, distanceUnit: e.target.value as Preferences['distanceUnit'] }))}><option value="km">Kilometres (km)</option><option value="mi">Miles (mi)</option></select></label>
-        <label>Energy units<select value={preferences.energyUnit} onChange={e => setPreferences(p => ({ ...p, energyUnit: e.target.value as Preferences['energyUnit'] }))}><option value="kcal">Kilocalories (kcal)</option><option value="kj">Kilojoules (kJ)</option></select></label>
-        <label>Water display<select value={preferences.waterUnit} onChange={e => setPreferences(p => ({ ...p, waterUnit: e.target.value as Preferences['waterUnit'] }))}><option value="ml">Millilitres (ml)</option><option value="oz">Fluid ounces (fl oz)</option></select></label>
-        <label>Daily water target (ml)<input type="number" min="250" max="10000" step="250" value={preferences.dailyWaterTargetMl} onChange={e => setPreferences(p => ({ ...p, dailyWaterTargetMl: Math.max(250, Number(e.target.value) || 250) }))}/></label>
-        <label>Daily step target<input type="number" min="500" max="50000" step="500" value={preferences.dailyStepTarget} onChange={e => setPreferences(p => ({ ...p, dailyStepTarget: Math.max(500, Number(e.target.value) || 500) }))}/></label>
-        <label>Week starts on<select value={preferences.weekStartsOn} onChange={e => setPreferences(p => ({ ...p, weekStartsOn: Number(e.target.value) as 0 | 1 }))}><option value={1}>Monday</option><option value={0}>Sunday</option></select></label>
-      </div><p className="settings-note"><Settings2 size={15}/> Changes are saved automatically on this device.</p></article>
-      <article className="panel"><PanelTitle tag="GENTLE NUDGES" title="Reminders"/><p className="muted-copy">Choose when Ovara should remind you. Notifications are checked while the workspace is open in this browser.</p><button className="btn outline small notification-button" onClick={enableNotifications}><Bell size={14}/> {permission === 'granted' ? 'Notifications enabled' : 'Enable browser notifications'}</button>{notice && <p className="settings-note"><Check size={14}/>{notice}</p>}<div className="add-reminder"><input aria-label="New reminder name" value={newReminderTitle} onChange={e=>setNewReminderTitle(e.target.value)} placeholder="Add a reminder"/><input aria-label="New reminder time" type="time" value={newReminderTime} onChange={e=>setNewReminderTime(e.target.value)}/><button className="btn outline small" onClick={addReminder} type="button">Add</button></div><div className="reminder-list">{reminders.map(item => <div className="reminder-item" key={item.id}><div><b>{item.title}</b><small>{item.kind[0].toUpperCase() + item.kind.slice(1)}</small><input aria-label={'Reminder time for ' + item.title} type="time" value={item.time} onChange={e => updateReminder(item.id, { time: e.target.value })}/><div className="reminder-days">{['S','M','T','W','T','F','S'].map((day,index)=><button type="button" key={index} aria-label={'Toggle ' + ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][index]} className={item.days.includes(index)?'active':''} onClick={()=>updateReminder(item.id,{days:item.days.includes(index)?item.days.filter(value=>value!==index):[...item.days,index]})}>{day}</button>)}</div></div><label className="switch"><input type="checkbox" checked={item.enabled} onChange={e => updateReminder(item.id, { enabled: e.target.checked })}/><span/></label></div>)}</div><p className="settings-note"><Droplets size={14}/> Reminder alerts do not run after the browser is closed. Background reminders can be added with push infrastructure later.</p></article>
-    </section>
+    <PageHeader title="Preferences" desc="Units, targets, reminders and your data."/>
+
+    <Card title="Your details">
+      <form onSubmit={saveProfile}>
+        <div className="form-grid">
+          <label className="field">Name<input value={name} onChange={event => setName(event.target.value)} autoComplete="name" required/></label>
+          <label className="field">Email (optional)<input type="email" value={email} onChange={event => setEmail(event.target.value)} autoComplete="email"/></label>
+        </div>
+        <div className="btn-row"><button type="submit" className="btn btn-primary">Save details</button></div>
+      </form>
+    </Card>
+
+    <div className="grid-2">
+      <Card title="Units and targets">
+        <div className="form-grid single">
+          <label className="field">Distance<select value={preferences.distanceUnit} onChange={event => setPref('distanceUnit', event.target.value as Preferences['distanceUnit'])}><option value="km">Kilometres</option><option value="mi">Miles</option></select></label>
+          <label className="field">Energy<select value={preferences.energyUnit} onChange={event => setPref('energyUnit', event.target.value as Preferences['energyUnit'])}><option value="kcal">Kilocalories</option><option value="kj">Kilojoules</option></select></label>
+          <label className="field">Water<select value={preferences.waterUnit} onChange={event => setPref('waterUnit', event.target.value as Preferences['waterUnit'])}><option value="ml">Millilitres</option><option value="oz">Fluid ounces</option></select></label>
+          <label className="field">Daily water target in ml<input type="number" inputMode="numeric" min="250" max="10000" step="250" value={preferences.dailyWaterTargetMl} onChange={event => setPref('dailyWaterTargetMl', clampNumber(event.target.value, 250, 10000))}/></label>
+          <label className="field">Daily step target<input type="number" inputMode="numeric" min="500" max="50000" step="500" value={preferences.dailyStepTarget} onChange={event => setPref('dailyStepTarget', clampNumber(event.target.value, 500, 50000))}/></label>
+          <label className="field">Week starts on<select value={preferences.weekStartsOn} onChange={event => setPref('weekStartsOn', Number(event.target.value) as 0 | 1)}><option value={1}>Monday</option><option value={0}>Sunday</option></select></label>
+        </div>
+        <p className="muted small-print">Changes save automatically on this device.</p>
+      </Card>
+
+      <Card title="Reminders">
+        <p className="muted">Reminders only appear while Ovara is open in a browser tab.</p>
+        <div className="btn-row">
+          <button type="button" className="btn btn-secondary" onClick={requestPermission} disabled={permission === 'granted' || permission === 'unsupported'}><Bell size={18} aria-hidden="true"/>{permission === 'granted' ? 'Notifications are on' : 'Allow notifications'}</button>
+        </div>
+        <p className="muted small-print" role="status">{notice}</p>
+        <ul className="rows reminder-list">
+          {reminders.map(item => <li className="reminder" key={item.id}>
+            <div className="reminder-top">
+              <label className="switch"><input type="checkbox" checked={item.enabled} onChange={event => updateReminder(item.id, { enabled: event.target.checked })}/><span className="switch-track" aria-hidden="true"/><span className="switch-label">{item.title}</span></label>
+              <button type="button" className="icon-btn" aria-label={'Remove reminder ' + item.title} onClick={() => removeReminder(item.id, item.title)}><Trash2 size={18}/></button>
+            </div>
+            <div className="reminder-bottom">
+              <input className="time-input" aria-label={'Time for ' + item.title} type="time" value={item.time} onChange={event => updateReminder(item.id, { time: event.target.value })}/>
+              <div className="day-toggles" role="group" aria-label={'Days for ' + item.title}>
+                {dayNames.map((day, index) => <button type="button" key={day} aria-label={day} aria-pressed={item.days.includes(index)} onClick={() => updateReminder(item.id, { days: item.days.includes(index) ? item.days.filter(value => value !== index) : [...item.days, index] })}>{day[0]}</button>)}
+              </div>
+            </div>
+          </li>)}
+        </ul>
+        <form className="add-reminder" onSubmit={addReminder}>
+          <label className="field">New reminder<input value={reminderTitle} onChange={event => setReminderTitle(event.target.value)} placeholder="Stretch"/></label>
+          <label className="field">Time<input type="time" value={reminderTime} onChange={event => setReminderTime(event.target.value)}/></label>
+          <button type="submit" className="btn btn-secondary">Add</button>
+        </form>
+      </Card>
+    </div>
+
+    <Card title="Your data">
+      <p className="muted">Everything in Ovara is stored in this browser. There is no account and no backup, so download a copy before clearing browser data or switching devices.</p>
+      <div className="btn-row">
+        <button type="button" className="btn btn-secondary" onClick={download}><Download size={18} aria-hidden="true"/>Download my data</button>
+        <button type="button" className="btn btn-danger-outline" onClick={() => setConfirmReset(true)}><Trash2 size={18} aria-hidden="true"/>Reset my space</button>
+      </div>
+    </Card>
+
+    <ConfirmDialog open={confirmReset} title="Reset your space?" confirmLabel="Delete everything" danger onConfirm={reset} onCancel={() => setConfirmReset(false)}>
+      <p>This deletes your profile, entries, goals and reminders from this browser. It cannot be undone. Download your data first if you want a copy.</p>
+    </ConfirmDialog>
   </div>;
 }
