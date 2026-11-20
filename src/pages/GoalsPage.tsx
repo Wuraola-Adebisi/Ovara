@@ -12,30 +12,6 @@ const labels: Record<GoalCategory, string> = { steps: 'Steps', activity_minutes:
 const units: Record<GoalCategory, string> = { steps: 'steps', activity_minutes: 'min', water_ml: '', routine_completions: 'check-ins', journal_entries: 'entries' };
 const periodLabels: Record<GoalPeriod, string> = { daily: 'per day', weekly: 'per week', monthly: 'per month' };
 
-function goalPeriods(goal: WellbeingGoal, today: Date, weekStartsOn: 0 | 1) {
-  const currentStart = startOfPeriod(today, goal.period, weekStartsOn);
-  return Array.from({ length: 6 }, (_, index) => {
-    const offset = index - 5;
-    const start = new Date(currentStart);
-    if (goal.period === 'daily') start.setDate(start.getDate() + offset);
-    if (goal.period === 'weekly') start.setDate(start.getDate() + offset * 7);
-    if (goal.period === 'monthly') start.setMonth(start.getMonth() + offset);
-    const end = goal.period === 'daily' ? new Date(start) : goal.period === 'weekly' ? shiftDate(start, 6) : new Date(start.getFullYear(), start.getMonth() + 1, 0);
-    const key = localDate(start);
-    return {
-      key,
-      label: goal.period === 'daily'
-        ? start.toLocaleDateString(undefined, { weekday: 'short' })
-        : goal.period === 'weekly'
-          ? start.toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
-          : start.toLocaleDateString(undefined, { month: 'short' }),
-      value: getGoalValueForRange(goal, dataPlaceholder, key, localDate(end)),
-      isCurrent: offset === 0,
-    };
-  });
-}
-
-const dataPlaceholder = { activities: [], water: [], journals: [], completions: [] };
 
 export default function GoalsPage() {
   const today = useToday();
