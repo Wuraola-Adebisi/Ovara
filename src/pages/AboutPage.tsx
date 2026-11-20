@@ -3,50 +3,44 @@ import { ArrowRight } from 'lucide-react';
 import { usePageTitle } from '../components/PagePrimitives';
 
 const principles = [
-  ['No required numbers', 'Every number in Ovara is optional. You can log a walk without steps, a meal without energy and a day without a mood. Targets exist only if you set them.'],
-  ['Records, not scores', 'Ovara shows what you logged and how it compares with the period before. It does not grade you, rank you or reward streaks, so a quiet week looks like a quiet week.'],
-  ['Private by default', 'Your entries are saved in your browser and go nowhere else. There is no account to create and no server holding a copy.'],
-  ['Use what helps', 'Pick the areas you care about at setup. The rest stays out of the way until you want it.'],
+  ['No required numbers', 'You can note a walk without counting steps, write about a meal without adding numbers, or leave a mood check-in for another day. Any targets are yours to choose.'],
+  ['Room for real life', 'Some weeks are full. Others are quieter. Ovara helps you look back without grades, rankings or streaks to keep alive.'],
+  ['Private by default', 'Your notes stay in the browser on the device you use. You can download a copy to keep or move to another device.'],
+  ['Make it your own', 'Choose the parts that feel useful to you. Leave the rest aside, and come back whenever you want.'],
 ] as const;
 
 const limits = [
-  'Entries live in one browser on one device. There is no live sync, but you can download your data and restore it on another device.',
-  'Reminders only appear while Ovara is open in a browser tab.',
-  'There is no mobile app yet. Ovara runs in the browser on phones and computers.',
-  'Insights are simple calculations on your own entries. They describe what you logged and do not predict or diagnose anything.',
+  'Your information stays in the browser and on the device where you added it. To use it on another device, download a copy and restore it there.',
+  'Reminders appear while Ovara is open in a browser tab.',
+  'You can use Ovara in a browser on your phone or computer. There is no separate mobile app.',
+  'The summaries show what you have recorded. They cannot explain why something happened or tell you what to do about it.',
 ] as const;
 
 export default function AboutPage() {
   usePageTitle('Our approach');
   return <main className="prose-page" id="main">
     <div className="container narrow">
+      <span className="eyebrow">A little about us</span>
       <h1>Wellbeing is more than one number.</h1>
-      <p className="lead">How you move, eat, rest and feel affect each other. Most apps track one of these. Ovara puts the everyday pieces in one place so you can see how they relate.</p>
+      <p className="lead">How you move, eat, rest and feel are all part of the same life. Ovara gives those everyday moments a place together, so you can notice what matters to you.</p>
 
-      <h2>Why it exists</h2>
-      <p>A busy week changes what you eat. A walk can change your mood. A small routine can make room for rest. Those links are easy to miss when each habit lives in a different app, so Ovara keeps them together and shows them side by side.</p>
-      <p>It is built for people who want a record without pressure. Nothing in Ovara is graded, ranked or compared with other people.</p>
+      <h2>Why Ovara exists</h2>
+      <p>A busy week can change the way you eat. A walk can give you room to think. A small routine can make a little more space for rest. These moments are easy to overlook when they are scattered, so Ovara brings them together.</p>
+      <p>It is for anyone who wants to pay attention without putting themselves under pressure. Your days do not need to look a certain way.</p>
 
-      <h2>Principles</h2>
+      <h2>What matters to us</h2>
       <dl className="principle-list">{principles.map(([title, body]) => <div key={title}><dt>{title}</dt><dd>{body}</dd></div>)}</dl>
 
-      <h2>What it will not do</h2>
-      <ul className="plain-list">
-        <li>It will not set a calorie target for you. Energy estimates are optional.</li>
-        <li>It will not diagnose, treat or give medical advice.</li>
-        <li>It will not send your entries to a server. You can download or delete them at any time.</li>
-      </ul>
-
-      <h2>Current limits</h2>
-      <p>Ovara is early. These are the limits as they stand today.</p>
+      <h2>A few things to know</h2>
       <ul className="plain-list">{limits.map(item => <li key={item}>{item}</li>)}</ul>
 
-      <h2>Tell us what is missing</h2>
-      <p>Ovara changes based on how people use it. If something does not fit your day, <Link to="/contact">send a note</Link>. The <Link to="/help">help page</Link> covers the most common questions.</p>
+      <h2>Your wellbeing is your own</h2>
+      <p>Ovara is a place to keep personal notes and notice patterns. It does not diagnose, treat or give medical advice. Energy estimates are optional, and Ovara will never set a calorie target for you.</p>
 
-      <div className="cta-inline">
-        <Link to="/app" className="btn btn-primary btn-lg">Open your space<ArrowRight size={20} aria-hidden="true"/></Link>
-      </div>
+      <h2>We would like to hear from you</h2>
+      <p>If something would make Ovara more useful in your everyday life, <Link to="/contact">tell us about it</Link>. You can also find answers on the <Link to="/help">help page</Link>.</p>
+
+      <div className="cta-inline"><Link to="/app" className="btn btn-primary btn-lg">Find your rhythm<ArrowRight size={20} aria-hidden="true"/></Link></div>
     </div>
   </main>;
 }
