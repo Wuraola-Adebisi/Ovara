@@ -7,29 +7,30 @@ import { ActivityPreview, FoodPreview, GoalsPreview, InsightsPreview, JournalPre
 type Feature = { id: string; title: string; body: string; points: string[]; path: string; preview: ReactNode };
 
 const features: Feature[] = [
-  { id: 'activity', title: 'Activity', body: 'A log of walks, runs, rides, workouts, yoga and stretching. Each entry has a duration, and steps and distance if you want them. Steps are never required, so a yoga session does not need a made up number.', points: ['Chart of the last 7 days with your step target drawn on it', 'Minutes broken down by type of activity', 'Filter the history by type, and edit or remove any entry', 'Log an activity for an earlier date'], path: '/app/activity', preview: <ActivityPreview/> },
-  { id: 'food', title: 'Food and water', body: 'Note meals and snacks in your own words, grouped by meal. Energy is optional, and you can choose kilocalories or kilojoules. Water is counted in glasses with a daily target you set.', points: ['Step back through earlier days and add notes for them', 'Energy stored once and converted, so changing units never distorts old entries', 'Water history for 7 days in millilitres or fluid ounces', 'No calorie target anywhere in the app'], path: '/app/nutrition', preview: <FoodPreview/> },
-  { id: 'routines', title: 'Routines', body: 'A short list of things you want to do regularly, each with a time of day. Tick them off on the Today page or here. Ticks reset each day and the history stays.', points: ['Morning, afternoon, evening or anytime', 'A grid of the last 7 days for every routine', 'Rename, re-time or remove routines whenever you like', 'No streak counter, so a missed day costs nothing'], path: '/app/routines', preview: <RoutinesPreview/> },
-  { id: 'journal', title: 'Journal', body: 'A mood from six options and a free text note, one entry per day. Choose any past date to write or update that day.', points: ['Search across all your entries', 'A prompt each day if you want a starting point', 'A mood chosen on the Today page never overwrites your note', 'Anxious is kept as a feeling and left out of mood averages'], path: '/app/journal', preview: <JournalPreview/> },
-  { id: 'goals', title: 'Goals', body: 'Pick a measure (steps, active minutes, water, routine check-ins or journal entries), a target and a time frame. Progress is calculated from what you have already logged.', points: ['Daily, weekly or monthly, with your choice of week start', 'Ready made suggestions you can edit after adding', 'Water goals typed in your chosen unit', 'A goal is marked as reached once and then left alone'], path: '/app/goals', preview: <GoalsPreview/> },
-  { id: 'insights', title: 'Insights and calendar', body: 'Totals for the last 7 days or the current month, set against the period before. A day by day chart can show steps, minutes or water, and a mood strip shows each day at a glance. The calendar lists everything logged on any day.', points: ['Comparison with the previous week or month', 'Minutes by activity type', 'Month summary on the calendar', 'Plain observations calculated on your device'], path: '/app/insights', preview: <InsightsPreview/> },
+  { id: 'activity', title: 'Movement', body: 'From a morning walk to a favourite class, keep a note of the ways you move. Add a duration and, if you like, steps or distance.', points: ['See your movement through the week', 'Explore time spent on different activities', 'Change or remove a note whenever you need to', 'Add something you did on an earlier day'], path: '/app/activity', preview: <ActivityPreview/> },
+  { id: 'food', title: 'Food and water', body: 'Keep track of meals, snacks and water in a way that feels comfortable. Add a few words or a little more detail. It is entirely up to you.', points: ['Return to any earlier day', 'Add an optional energy estimate', 'Choose the units you prefer', 'No daily calorie target'], path: '/app/nutrition', preview: <FoodPreview/> },
+  { id: 'routines', title: 'Routines', body: 'Give the little things you want to do a place in your day. Choose a time of day, check in as you go and look back over the week.', points: ['Morning, afternoon, evening or anytime', 'See how each routine has fitted into your week', 'Change your list whenever you like', 'A missed day is simply a missed day'], path: '/app/routines', preview: <RoutinesPreview/> },
+  { id: 'journal', title: 'Journal', body: 'Take a moment to notice how you feel and write whatever is on your mind. You can return to an earlier day whenever you want.', points: ['Find an earlier note', 'Use a prompt when you need inspiration', 'Keep your thoughts and mood together', 'Write for today or a day gone by'], path: '/app/journal', preview: <JournalPreview/> },
+  { id: 'goals', title: 'Personal goals', body: 'Choose something you would like to make time for, set a target that feels right and follow your progress as you go.', points: ['Choose a daily, weekly or monthly rhythm', 'Start with an idea and make it your own', 'Adjust your target as life changes', 'See how things are taking shape'], path: '/app/goals', preview: <GoalsPreview/> },
+  { id: 'insights', title: 'Your weeks at a glance', body: 'Look back at recent days and months. Bring movement, water, routines and reflections together to see what stands out.', points: ['Compare recent weeks and months', 'See how your days add up', 'Explore your own patterns over time'], path: '/app/insights', preview: <InsightsPreview/> },
 ];
 
 const extras = [
-  ['Reminders', 'Set reminders for water, a pause or anything else, with times and days of the week. They appear while Ovara is open in a browser tab.'],
-  ['Units and targets', 'Kilometres or miles, kcal or kJ, millilitres or fluid ounces, plus your daily step and water targets and the first day of your week.'],
-  ['Download and restore', 'Save everything as a file, restore it on another device or after clearing your browser, or delete it all from this device.'],
-  ['Undo', 'Removing an entry never asks "are you sure". It removes it and shows an Undo button for a few seconds.'],
+  ['Gentle reminders', 'Choose a time to remind yourself about water, a pause or anything else you would like to remember.'],
+  ['Your preferences', 'Choose the units you are familiar with, set personal targets and pick the day your week begins.'],
+  ['Keep a copy', 'Download your information whenever you like, then use that file to bring it back if you change devices or clear your browser.'],
+  ['Change your mind', 'Remove something you no longer want to keep. You can also undo a recent removal.'],
 ] as const;
 
 export default function FeaturesPage() {
-  usePageTitle('Features');
+  usePageTitle('Explore Ovara');
   return <main id="main" className="features-page">
     <div className="container">
       <header className="page-intro">
-        <h1>Everything Ovara does</h1>
-        <p className="lead">Six areas that work together, plus the settings that make them fit your day. All of it runs in your browser.</p>
-        <nav className="anchor-nav" aria-label="On this page">{features.map(item => <a key={item.id} href={'#' + item.id}>{item.title}</a>)}<a href="#more">More</a></nav>
+        <span className="eyebrow">A little space for all of you</span>
+        <h1>Made for the shape of your day.</h1>
+        <p className="lead">Movement, nourishment, routines and reflection, all in one calm place. Choose what matters to you and leave the rest for another day.</p>
+        <nav className="anchor-nav" aria-label="On this page">{features.map(item => <a key={item.id} href={'#' + item.id}>{item.title}</a>)}<a href="#more">A few more things</a></nav>
       </header>
 
       {features.map((item, index) => <section key={item.id} id={item.id} className={index % 2 ? 'feature-row is-reverse' : 'feature-row'}>
@@ -37,17 +38,17 @@ export default function FeaturesPage() {
           <h2>{item.title}</h2>
           <p>{item.body}</p>
           <ul className="tick-list">{item.points.map(point => <li key={point}>{point}</li>)}</ul>
-          <Link className="text-link" to={item.path}>Open {item.title.toLowerCase()}<ArrowRight size={16} aria-hidden="true"/></Link>
+          <Link className="text-link" to={item.path}>Explore {item.title.toLowerCase()}<ArrowRight size={16} aria-hidden="true"/></Link>
         </div>
         {item.preview}
       </section>)}
 
       <section id="more" className="more-grid">
-        <h2>And the details around them</h2>
+        <h2>A few thoughtful details</h2>
         <dl>{extras.map(([title, body]) => <div key={title}><dt>{title}</dt><dd>{body}</dd></div>)}</dl>
       </section>
 
-      <div className="cta-inline"><Link to="/app" className="btn btn-primary btn-lg">Open your space<ArrowRight size={20} aria-hidden="true"/></Link></div>
+      <div className="cta-inline"><Link to="/app" className="btn btn-primary btn-lg">Find your rhythm<ArrowRight size={20} aria-hidden="true"/></Link></div>
     </div>
   </main>;
 }
