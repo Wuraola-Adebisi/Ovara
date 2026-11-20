@@ -4,6 +4,8 @@ import type {
 } from './types';
 
 export * from './types';
+export { getGoalValueForRange } from './goalProgress.js';
+import { getGoalValueForRange } from './goalProgress.js';
 
 // ---------- Dates ----------
 
@@ -142,15 +144,6 @@ export function collectEvents(data: Data, preferences: Preferences) {
   return events.sort((a, b) => b.date.localeCompare(a.date));
 }
 
-export function getGoalValueForRange(goal: WellbeingGoal, data: Pick<Data, 'activities' | 'water' | 'journals' | 'completions'>, startKey: string, endKey: string) {
-  const within = <T extends { date: string }>(items: T[]) => items.filter(item => item.date >= startKey && item.date <= endKey);
-  const activities = within(data.activities);
-  if (goal.category === 'steps') return activities.reduce((sum, item) => sum + item.steps, 0);
-  if (goal.category === 'activity_minutes') return activities.reduce((sum, item) => sum + item.minutes, 0);
-  if (goal.category === 'water_ml') return within(data.water).reduce((sum, item) => sum + item.ml, 0);
-  if (goal.category === 'routine_completions') return within(data.completions).length;
-  return within(data.journals).length;
-}
 
 export function getGoalValue(goal: WellbeingGoal, data: Pick<Data, 'activities' | 'water' | 'journals' | 'completions'>, now = new Date(), weekStartsOn: 0 | 1 = 1) {
   return getGoalValueForRange(goal, data, localDate(startOfPeriod(now, goal.period, weekStartsOn)), localDate(now));
