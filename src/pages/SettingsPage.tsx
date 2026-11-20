@@ -114,11 +114,11 @@ export default function SettingsPage() {
           <label className="field">Daily step target<input type="number" inputMode="numeric" min="500" max="50000" step="500" value={preferences.dailyStepTarget} onChange={event => setPref('dailyStepTarget', clampNumber(event.target.value, 500, 50000))}/></label>
           <label className="field">Week starts on<select value={preferences.weekStartsOn} onChange={event => setPref('weekStartsOn', Number(event.target.value) as 0 | 1)}><option value={1}>Monday</option><option value={0}>Sunday</option></select></label>
         </div>
-        <p className="muted small-print">Changes save automatically on this device.</p>
+        <p className="muted small-print">Changes save automatically as you make them.</p>
       </Card>
 
       <Card title="Reminders">
-        <p className="muted">Reminders can notify you while Ovara is open in this browser. They do not run when the app is closed.</p>
+        <p className="muted">Allow notifications, then keep Ovara open around the times you choose.</p>
         <div className="btn-row">
           <button type="button" className="btn btn-secondary" onClick={requestPermission} disabled={permission === 'granted' || permission === 'unsupported'}><Bell size={18} aria-hidden="true"/>{permission === 'granted' ? 'Notifications are on' : 'Allow notifications'}</button>
         </div>
@@ -147,7 +147,7 @@ export default function SettingsPage() {
     </div>
 
     <Card title="Your data">
-      <p className="muted">Everything in Ovara is stored in this browser. Download a copy to keep or move your information to another device. Restoring a file replaces the information currently saved here.</p>
+      <p className="muted">Your information is kept in the browser you use. Download a copy to keep it safe or move it to another device. Restoring a file replaces the information in your Ovara space.</p>
       {importError && <p className="form-error" role="alert">{importError}</p>}
       <div className="btn-row">
         <button type="button" className="btn btn-secondary" onClick={download}><Download size={18} aria-hidden="true"/>Download my data</button>

@@ -5,7 +5,7 @@ import { usePageTitle } from '../components/PagePrimitives';
 const principles = [
   ['No required numbers', 'You can note a walk without counting steps, write about a meal without adding numbers, or leave a mood check-in for another day. Any targets are yours to choose.'],
   ['Room for real life', 'Some weeks are full. Others are quieter. Ovara helps you look back without grades, rankings or streaks to keep alive.'],
-  ['Private by default', 'Your notes are saved on the device you use. You can download a copy to keep or move to another device.'],
+  ['Private by default', 'Your reflections are personal. Download a copy whenever you want to keep them close.'],
   ['Make it your own', 'Choose the parts that feel useful to you. Leave the rest aside, and come back whenever you want.'],
 ] as const;
 

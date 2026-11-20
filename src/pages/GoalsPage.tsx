@@ -112,6 +112,6 @@ export default function GoalsPage() {
           })}
         </ul>}
     </Card>
-    <p className="muted small-print">Historical progress is calculated from the records currently saved on this device. Periods before a goal was created are shown as recorded activity, not as missed goal attempts. Goals are personal targets, not health recommendations.</p>
+    <p className="muted small-print">Choose targets that feel realistic for you, and adjust them as your priorities change.</p>
   </div>;
 }

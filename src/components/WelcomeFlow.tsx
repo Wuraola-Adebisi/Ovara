@@ -46,7 +46,7 @@ export default function WelcomeFlow({ onComplete }: { onComplete: (profile: User
       <Wordmark/>
       {step === 0 ? <form key="step-details" onSubmit={next} noValidate>
         <h1>Set up your space</h1>
-        <p className="muted">Your entries stay in this browser. Nothing is sent to a server.</p>
+        <p className="muted">A few details will help make Ovara feel more like yours.</p>
         <label className="field">What should we call you?<input value={name} onChange={event => setName(event.target.value)} autoComplete="given-name" aria-invalid={Boolean(error) && !name.trim()} aria-describedby={error ? 'welcome-error' : undefined} autoFocus/></label>
         <label className="field">Email (optional)<input type="email" value={email} onChange={event => setEmail(event.target.value)} autoComplete="email" aria-describedby="email-help"/><small id="email-help">Only used to show your details here. Leave it empty if you prefer.</small></label>
         {error && <p className="form-error" id="welcome-error" role="alert">{error}</p>}

@@ -8,10 +8,10 @@ export const faqGroups: FaqGroup[] = [
     { q: 'Is Ovara a medical or fitness programme?', a: 'No. Ovara is a personal space for everyday notes and reflection. It does not give medical advice or create a training plan.' },
   ] },
   { id: 'data', title: 'Your information', items: [
-    { q: 'Where is my information kept?', a: 'Your entries are saved on the device you use. They are not connected to an online Ovara account.' },
+    { q: 'Where is my information kept?', a: 'Ovara keeps your information in the browser where you use it, rather than in an online account.' },
     { q: 'Can I use Ovara on another device?', a: 'Yes. Download a copy from Preferences, then import it into Ovara on the other device.' },
     { q: 'How do I keep a copy or start over?', a: 'Open Preferences to download a copy of your information or clear your space. Clearing it cannot be undone, so save a copy first if you might need it.' },
-    { q: 'Who can see my notes?', a: 'Anyone who can access your browser profile on your device may be able to see them. Take care when using a shared computer.' },
+    { q: 'Who can see my notes?', a: 'Anyone who can access your browser profile may be able to see them. Take care when using a shared computer.' },
   ] },
   { id: 'tracking', title: 'Everyday notes', items: [
     { q: 'Why is there no calorie target?', a: 'You can add an energy estimate to a meal if you want, but Ovara will never tell you how much to eat. You can use the Food page without numbers.' },
@@ -24,7 +24,7 @@ export const faqGroups: FaqGroup[] = [
     { q: 'Why did a reminder not appear?', a: 'Check that notifications are allowed for Ovara, that the reminder is switched on for that day and that Ovara is open around the time you chose.' },
   ] },
   { id: 'problems', title: 'If something does not look right', items: [
-    { q: 'I cannot see my notes. Where did they go?', a: 'Your entries are saved on the device and in the browser where you added them. They may not appear if you switch browsers, use a private window or clear your browsing data. If you made a copy, you can restore it from Preferences.' },
+    { q: 'I cannot see my notes. Where did they go?', a: 'Ovara keeps your notes in the browser where you added them. If you switch browsers, use a private window or clear your browsing data, they may no longer appear. If you downloaded a copy, you can restore it from Preferences.' },
     { q: 'The day or time looks wrong.', a: 'Ovara uses the date, time and time zone set on your device. Check those settings, then reload the page.' },
     { q: 'Why is a chart empty?', a: 'Charts reflect the entries you have added for the period you are viewing. For example, steps appear when you include a step count in an activity.' },
   ] },
