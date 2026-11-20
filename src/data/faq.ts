@@ -31,5 +31,28 @@ export const faqGroups: FaqGroup[] = [
 ];
 
 export const homeFaq = [
-  faqGroups[0].items[0], faqGroups[1].items[0], faqGroups[1].items[1], faqGroups[2].items[0], faqGroups[0].items[3], faqGroups[3].items[0],
+  {
+    q: 'What can I keep track of with Ovara?',
+    a: 'Keep notes on movement, meals, water, routines and how you feel. You can also journal, set personal goals and see your days together on a calendar.',
+  },
+  {
+    q: 'Can I choose which parts of Ovara to use?',
+    a: 'Yes. Use the parts that feel useful to you and leave the rest aside. You can change what you focus on whenever you like.',
+  },
+  {
+    q: 'Can I set goals that fit my life?',
+    a: 'Yes. Set personal goals with a daily, weekly or monthly rhythm, choose a target that feels right and adjust it as your circumstances change.',
+  },
+  {
+    q: 'Can I look back at my progress?',
+    a: 'Yes. Your calendar and insights help you revisit earlier days and see how your activity, routines, water and reflections have taken shape over time.',
+  },
+  {
+    q: 'Can I change something after I have saved it?',
+    a: 'Yes. You can edit activities, meal notes, routines, goals and journal entries whenever you need to.',
+  },
+  {
+    q: 'Can Ovara remind me about things?',
+    a: 'You can set reminders for the things you want to make time for, such as drinking water or taking a pause. Reminders can appear while Ovara is open in your browser.',
+  },
 ];
