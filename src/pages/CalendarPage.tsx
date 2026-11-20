@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useStore } from '../lib/store';
 import { useToday } from '../hooks/useToday';
 import { Card, EmptyState, PageFeature, PageHeader } from '../components/PagePrimitives';
@@ -7,6 +8,13 @@ import { collectEvents, formatDay, localDate } from '../lib/wellbeing';
 
 const typeLabels = { activity: 'Activity', meal: 'Food', water: 'Water', journal: 'Journal', routine: 'Routine' } as const;
 const weekdayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const eventPaths = {
+  activity: '/app/activity',
+  meal: '/app/nutrition',
+  water: '/app/nutrition',
+  journal: '/app/journal',
+  routine: '/app/routines',
+} as const;
 
 export default function CalendarPage() {
   const today = useToday();
@@ -41,6 +49,12 @@ export default function CalendarPage() {
     setSelected(localDate(next));
   }
 
+  function selectToday() {
+    const date = new Date(today + 'T12:00:00');
+    setMonth(new Date(date.getFullYear(), date.getMonth(), 1));
+    setSelected(today);
+  }
+
   return <div className="stack">
     <PageHeader title="Calendar" desc="Everything you logged, by day."/>
     <PageFeature eyebrow="Your life, in the bigger picture" text="See the days behind the numbers. Your calendar brings activity, meals, water, routines and reflections together so you can look back with context." image="https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=1200&q=85" imageAlt="A planner and notebook open on a desk" />
@@ -50,6 +64,7 @@ export default function CalendarPage() {
         <div className="calendar-head">
           <h2>{month.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}</h2>
           <div className="btn-row">
+            <button type="button" className="btn btn-secondary calendar-today" onClick={selectToday}>Today</button>
             <button type="button" className="icon-btn" aria-label="Previous month" onClick={() => changeMonth(-1)}><ChevronLeft size={20}/></button>
             <button type="button" className="icon-btn" aria-label="Next month" onClick={() => changeMonth(1)}><ChevronRight size={20}/></button>
           </div>
@@ -60,7 +75,7 @@ export default function CalendarPage() {
             if (!key) return <span className="calendar-blank" key={'blank-' + index}/>;
             const dayEvents = eventsByDay.get(key) ?? [];
             const types = [...new Set(dayEvents.map(event => event.type))];
-            return <button type="button" key={key} aria-pressed={key === selected} aria-label={formatDay(key, { weekday: 'long', day: 'numeric', month: 'long' }) + ', ' + (dayEvents.length ? dayEvents.length + ' entries' : 'no entries')} className={['calendar-day', key === today ? 'is-today' : ''].join(' ').trim()} onClick={() => setSelected(key)}>
+            return <button type="button" key={key} aria-pressed={key === selected} aria-label={formatDay(key, { weekday: 'long', day: 'numeric', month: 'long' }) + ', ' + (dayEvents.length ? dayEvents.length + ' entries' : 'no entries')} className={['calendar-day', key === today ? 'is-today' : '', key === selected ? 'is-selected' : ''].filter(Boolean).join(' ')} onClick={() => setSelected(key)}>
               <b>{Number(key.slice(-2))}</b>
               <span className="dots" aria-hidden="true">{types.map(type => <i key={type} className={'dot dot-' + type}/>)}</span>
             </button>;
@@ -69,8 +84,12 @@ export default function CalendarPage() {
         <ul className="legend">{Object.entries(typeLabels).map(([type, label]) => <li key={type}><i className={'dot dot-' + type} aria-hidden="true"/>{label}</li>)}</ul>
       </Card>
       <Card title={formatDay(selected, { weekday: 'long', day: 'numeric', month: 'long' })}>
-        {selectedEvents.length === 0 ? <EmptyState title="Nothing logged" body="No entries for this day."/> :
-          <ul className="rows">{selectedEvents.map(event => <li className="row" key={event.id}><i className={'dot dot-' + event.type} aria-hidden="true"/><div className="row-main"><b>{event.title}</b><small>{typeLabels[event.type]}, {event.detail}</small></div></li>)}</ul>}
+        {selectedEvents.length === 0 ? <EmptyState title="Nothing logged" body="No entries for this day. Choose another date to look back at your records."/> :
+          <ul className="rows">{selectedEvents.map(event => <li className="row calendar-event" key={event.id}>
+            <i className={'dot dot-' + event.type} aria-hidden="true"/>
+            <div className="row-main"><b>{event.title}</b><small>{typeLabels[event.type]}, {event.detail}</small></div>
+            <Link className="calendar-event-link" to={eventPaths[event.type]} state={{ calendarDate: event.date, calendarEventId: event.id }} aria-label={'Open ' + event.title + ' in ' + typeLabels[event.type]}><ExternalLink size={17} aria-hidden="true"/></Link>
+          </li>)}</ul>}
       </Card>
     </div>
   </div>;
