@@ -597,3 +597,43 @@ ul, ol, dl, dd { margin: 0; padding: 0; list-style: none; }
   .dashboard-shortcut { min-height: 72px; }
   .dashboard-section-heading h2 { font-size: var(--text-xl); }
 }
+
+
+/* ---------- Journal and routine history ---------- */
+.journal-date-field { display: inline-flex; align-items: center; }
+.journal-date-field input { max-width: 158px; min-height: 40px; padding: 7px 9px; border: 1px solid var(--color-line-strong); border-radius: var(--radius-field); background: var(--color-surface); color: var(--color-ink); font: inherit; font-size: var(--text-sm); }
+.journal-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 7px; }
+.journal-week-day { display: grid; justify-items: center; gap: 5px; min-width: 0; padding: 10px 3px; border: 1px solid var(--color-line); border-radius: 12px; background: var(--color-surface); color: var(--color-muted); cursor: pointer; }
+.journal-week-day small { font-size: var(--text-xs); }
+.journal-week-day b { color: var(--color-ink); font-family: var(--font-display); font-size: var(--text-lg); }
+.journal-week-day span { font-size: 10px; line-height: 1.2; }
+.journal-week-day.has-entry { border-color: var(--color-accent); background: var(--color-tint); }
+.journal-week-day.is-selected { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.row-actions { display: inline-flex; align-items: center; gap: 4px; flex: none; }
+.routine-overview { align-items: stretch; }
+.routine-week-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.routine-week-stats > div { display: grid; gap: 3px; }
+.routine-week-stats b { font-family: var(--font-display); font-size: var(--text-2xl); font-variant-numeric: tabular-nums; }
+.routine-week-stats span { color: var(--color-muted); font-size: var(--text-xs); line-height: 1.4; }
+.routine-week-dots { display: grid; grid-template-columns: repeat(7, 1fr); gap: 7px; margin-top: 18px; }
+.routine-week-dots span { height: 7px; border-radius: var(--radius-pill); background: var(--color-line); }
+.routine-week-dots span.is-active { background: var(--color-accent); }
+.routine-history-wrap { width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; }
+.routine-history { width: 100%; min-width: 540px; border-collapse: collapse; font-size: var(--text-sm); }
+.routine-history th, .routine-history td { padding: 11px 8px; border-bottom: 1px solid var(--color-line); text-align: center; }
+.routine-history thead th { color: var(--color-muted); font-weight: 600; }
+.routine-history thead th:first-child { text-align: left; }
+.routine-history thead th span, .routine-history thead th b { display: block; }
+.routine-history thead th b { margin-top: 3px; color: var(--color-ink); font-size: var(--text-base); }
+.routine-history tbody th { min-width: 160px; text-align: left; font-weight: 600; }
+.routine-history tbody th span, .routine-history tbody th small { display: block; }
+.routine-history tbody th small { margin-top: 3px; color: var(--color-muted); font-size: var(--text-xs); font-weight: 400; }
+.routine-history-mark { display: inline-grid; place-items: center; width: 25px; height: 25px; border-radius: 50%; background: var(--color-tint); color: var(--color-muted); font-weight: 700; }
+.routine-history-mark.is-done { background: #e5eee1; color: #42633c; }
+@media (max-width: 639px) {
+  .routine-week-stats { gap: 7px; }
+  .routine-week-stats b { font-size: var(--text-xl); }
+  .journal-week { gap: 4px; }
+  .journal-week-day { padding: 9px 1px; }
+  .journal-week-day span { font-size: 9px; }
+}
