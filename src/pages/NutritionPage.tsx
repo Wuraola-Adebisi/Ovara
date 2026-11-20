@@ -6,7 +6,7 @@ import { useStore } from '../lib/store';
 import { useToday } from '../hooks/useToday';
 import { useUndoRemove } from '../hooks/useUndoRemove';
 import { useToast } from '../components/Toast';
-import { Card, EmptyState, PageHeader } from '../components/PagePrimitives';
+import { Card, EmptyState, PageFeature, PageHeader } from '../components/PagePrimitives';
 import WaterCard from '../components/WaterCard';
 import { displayToKcal, getMealDate, kcalToDisplay } from '../lib/wellbeing';
 
@@ -42,6 +42,8 @@ export default function NutritionPage() {
 
   return <div className="stack">
     <PageHeader title="Food and water" desc="Note what you eat and drink. Energy estimates are optional." action={<button type="button" className="btn btn-primary" aria-expanded={showForm} onClick={() => setShowForm(value => !value)}><Plus size={18} aria-hidden="true"/>Add a meal</button>}/>
+
+    <PageFeature eyebrow="Nourishment without the scorekeeping" text="Food is more than a number. Keep simple notes about meals, notice what helps you feel cared for and make hydration part of your day in a way that works for you." image="https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=1200&q=85" imageAlt="A colourful spread of fresh vegetables, grains and nourishing foods" />
 
     {showForm && <form className="card form-card" onSubmit={addMeal}>
       <div className="card-head"><h2>Add a food note</h2></div>

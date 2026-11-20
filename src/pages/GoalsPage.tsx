@@ -4,7 +4,7 @@ import { Plus, Trash2 } from 'lucide-react';
 import { useStore } from '../lib/store';
 import { useToday } from '../hooks/useToday';
 import { useUndoRemove } from '../hooks/useUndoRemove';
-import { Card, EmptyState, Meter, PageHeader } from '../components/PagePrimitives';
+import { Card, EmptyState, Meter, PageFeature, PageHeader } from '../components/PagePrimitives';
 import { formatWater, getGoalValue, waterToMl } from '../lib/wellbeing';
 import type { GoalCategory, GoalPeriod } from '../lib/types';
 
@@ -46,6 +46,8 @@ export default function GoalsPage() {
 
   return <div className="stack">
     <PageHeader title="Goals" desc="Targets you set for yourself. Progress comes from what you log." action={<button type="button" className="btn btn-primary" aria-expanded={showForm} onClick={() => setShowForm(value => !value)}><Plus size={18} aria-hidden="true"/>Add a goal</button>}/>
+
+    <PageFeature eyebrow="Choose a direction that feels right" text="Goals give your intentions a little structure. Set a target that reflects your priorities, check in as you go and change course when you need to." image="https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=1200&q=85" imageAlt="A notebook and planner laid out for thoughtful goal setting" />
 
     {showForm && <form className="card form-card" onSubmit={addGoal}>
       <div className="card-head"><h2>Add a goal</h2></div>

@@ -6,7 +6,7 @@ import { useStore } from '../lib/store';
 import { useToday } from '../hooks/useToday';
 import { useUndoRemove } from '../hooks/useUndoRemove';
 import { useToast } from '../components/Toast';
-import { Card, EmptyState, PageHeader } from '../components/PagePrimitives';
+import { Card, EmptyState, PageFeature, PageHeader } from '../components/PagePrimitives';
 import BarChart from '../components/BarChart';
 import { displayToKm, formatDay, kmToDisplay, lastDays, sumFor } from '../lib/wellbeing';
 import type { ActivityRecord } from '../lib/types';
@@ -53,6 +53,8 @@ export default function ActivityPage() {
 
   return <div className="stack">
     <PageHeader title="Activity" desc="Log walks, workouts and stretches. Short sessions count." action={<button type="button" className="btn btn-primary" aria-expanded={showForm} onClick={() => setShowForm(value => !value)}><Plus size={18} aria-hidden="true"/>Log activity</button>}/>
+
+    <PageFeature eyebrow="Find your kind of movement" text="A walk, a stretch between tasks or a longer session all count. Keep a record of the movement that feels good and fits into your day." image="https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?auto=format&fit=crop&w=1200&q=85" imageAlt="Runner moving along a green outdoor trail" />
 
     {showForm && <form className="card form-card" onSubmit={addEntry}>
       <div className="card-head"><h2>Log an activity</h2></div>

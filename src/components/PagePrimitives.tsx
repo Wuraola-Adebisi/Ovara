@@ -10,6 +10,13 @@ export function PageHeader({ title, desc, action }: { title: string; desc?: stri
   return <header className="page-head"><div><h1>{title}</h1>{desc && <p>{desc}</p>}</div>{action && <div className="page-head-action">{action}</div>}</header>;
 }
 
+export function PageFeature({ eyebrow, text, image, imageAlt }: { eyebrow: string; text: string; image: string; imageAlt: string }) {
+  return <section className="page-feature" aria-label={eyebrow}>
+    <div className="page-feature-copy"><span className="eyebrow">{eyebrow}</span><p>{text}</p></div>
+    <img src={image} alt={imageAlt} loading="lazy" />
+  </section>;
+}
+
 export function Card({ title, action, children, className = '' }: { title?: string; action?: ReactNode; children: ReactNode; className?: string }) {
   return <section className={('card ' + className).trim()}>
     {(title || action) && <div className="card-head">{title && <h2>{title}</h2>}{action}</div>}
