@@ -5,19 +5,12 @@ import { usePageTitle } from '../components/PagePrimitives';
 const principles = [
   ['No required numbers', 'You can note a walk without counting steps, write about a meal without adding numbers, or leave a mood check-in for another day. Any targets are yours to choose.'],
   ['Room for real life', 'Some weeks are full. Others are quieter. Ovara helps you look back without grades, rankings or streaks to keep alive.'],
-  ['Private by default', 'Your notes stay in the browser on the device you use. You can download a copy to keep or move to another device.'],
+  ['Private by default', 'Your notes are saved on the device you use. You can download a copy to keep or move to another device.'],
   ['Make it your own', 'Choose the parts that feel useful to you. Leave the rest aside, and come back whenever you want.'],
 ] as const;
 
-const limits = [
-  'Your information stays in the browser and on the device where you added it. To use it on another device, download a copy and restore it there.',
-  'Reminders appear while Ovara is open in a browser tab.',
-  'You can use Ovara in a browser on your phone or computer. There is no separate mobile app.',
-  'The summaries show what you have recorded. They cannot explain why something happened or tell you what to do about it.',
-] as const;
-
 export default function AboutPage() {
-  usePageTitle('Our approach');
+  usePageTitle('About Ovara');
   return <main className="prose-page" id="main">
     <div className="container narrow">
       <span className="eyebrow">A little about us</span>
@@ -30,9 +23,6 @@ export default function AboutPage() {
 
       <h2>What matters to us</h2>
       <dl className="principle-list">{principles.map(([title, body]) => <div key={title}><dt>{title}</dt><dd>{body}</dd></div>)}</dl>
-
-      <h2>A few things to know</h2>
-      <ul className="plain-list">{limits.map(item => <li key={item}>{item}</li>)}</ul>
 
       <h2>Your wellbeing is your own</h2>
       <p>Ovara is a place to keep personal notes and notice patterns. It does not diagnose, treat or give medical advice. Energy estimates are optional, and Ovara will never set a calorie target for you.</p>
