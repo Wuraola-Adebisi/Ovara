@@ -88,11 +88,11 @@ export default function InsightsPage() {
           <div><dt>Water total</dt><dd>{waterTotal.value}<small> {waterTotal.unit}</small></dd></div>
           <div><dt>Average mood</dt><dd>{stats.moodAverage === null ? '—' : stats.moodAverage.toFixed(1)}<small>{stats.moodAverage === null ? ' not enough entries' : ' / 5'}</small></dd></div>
         </dl>
-        {stats.waterMl > 0 && previous.waterMl > 0 && <p className="muted small-print">Water logged previously: {previousWater.value} {previousWater.unit}. These totals reflect entries you recorded, not necessarily everything you consumed.</p>}
+        {stats.waterMl > 0 && previous.waterMl > 0 && <p className="muted small-print">Water logged previously: {previousWater.value} {previousWater.unit}. These totals reflect the water you have added to Ovara.</p>}
       </Card>
       <Card title="What your entries show">
         <ul className="insight-list">{insights.map(item => <li key={item.title}><h3>{item.title}</h3><p>{item.body}</p></li>)}</ul>
-        <p className="muted small-print">These are observations from your own entries. A difference between periods does not establish why a pattern changed.</p>
+        
       </Card>
     </>}
   </div>;
