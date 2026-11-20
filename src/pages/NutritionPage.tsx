@@ -68,11 +68,12 @@ export default function NutritionPage() {
     const state = location.state as { calendarEventId?: string; calendarDate?: string } | null;
     if (state?.calendarDate) setSelectedDate(state.calendarDate);
     const eventId = state?.calendarEventId;
-    if (!eventId?.startsWith('meal-')) return;
-    const mealId = Number(eventId.slice('meal-'.length));
-    const meal = meals.find(item => item.id === mealId);
-    if (meal) startEdit(meal);
-    navigate(location.pathname, { replace: true, state: null });
+    if (eventId?.startsWith('meal-')) {
+      const mealId = Number(eventId.slice('meal-'.length));
+      const meal = meals.find(item => item.id === mealId);
+      if (meal) startEdit(meal);
+    }
+    if (state?.calendarDate || eventId) navigate(location.pathname, { replace: true, state: null });
   }, [location.key, meals]);
 
   function saveMeal(event: FormEvent) {
