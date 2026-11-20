@@ -1,3 +1,28 @@
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, Heart, Leaf, Sprout } from 'lucide-react';
-export default function AboutPage(){return <main className="content-page about-page"><div className="content-hero"><span className="eyebrow"><i/> OUR APPROACH</span><h1>Wellbeing is a<br/><em>whole-life</em> thing.</h1><p>Not a finish line. Not a flawless morning routine. A collection of everyday choices, feelings and moments that make up being human.</p></div><div className="about-photo"><img src="https://images.pexels.com/photos/2908175/pexels-photo-2908175.jpeg?auto=compress&cs=tinysrgb&w=1600" alt="A woman meditating in a leafy outdoor space"/><span>There is room for every version of you.</span></div><section className="content-prose"><div className="section-kicker">WHY OVARA EXISTS</div><div><h2>Life doesn't happen<br/>in separate categories.</h2><p>We often think about movement, food, sleep, habits and mental wellbeing as separate things. But they meet in the middle of everyday life. A busy week changes how we eat. A good walk can shift our mood. A little structure can make room for rest.</p><p>Ovara is a personal space for noticing those connections. It brings the practical parts of looking after yourself into one place, while leaving room for your life to be your own.</p></div></section><section className="values-row"><article><Sprout/><h3>Gentle, not rigid.</h3><p>Progress does not have to be loud, linear or measured every day.</p></article><article><Heart/><h3>Personal, not prescriptive.</h3><p>Your goals and rhythms belong to you. There is no universal template for wellbeing.</p></article><article><Leaf/><h3>Whole, not fragmented.</h3><p>Movement, nourishment, routines and reflection all have a place.</p></article></section><div className="content-cta"><div><span className="eyebrow light-eyebrow">YOUR SPACE IS WAITING</span><h2>Start with what<br/>matters today.</h2></div><Link to="/app" className="button-light">Explore Ovara <ArrowUpRight size={16}/></Link></div></main>}
+import { ArrowRight } from 'lucide-react';
+import { usePageTitle } from '../components/PagePrimitives';
+
+export default function AboutPage() {
+  usePageTitle('Our approach');
+  return <main className="prose-page" id="main">
+    <div className="container narrow">
+      <h1>Wellbeing is more than one number.</h1>
+      <p className="lead">How you move, eat, rest and feel affect each other. Most apps track one of these. Ovara puts the everyday pieces in one place so you can see how they relate.</p>
+
+      <h2>Why it exists</h2>
+      <p>A busy week changes what you eat. A walk can change your mood. A small routine can make room for rest. Those links are easy to miss when each habit lives in a different app, so Ovara keeps them together and shows them side by side.</p>
+      <p>It is built for people who want a record without pressure. Nothing in Ovara is graded, ranked or compared with other people.</p>
+
+      <h2>What it will not do</h2>
+      <ul className="plain-list">
+        <li>It will not set a calorie target for you. Energy estimates are optional.</li>
+        <li>It will not diagnose, treat or give medical advice.</li>
+        <li>It will not send your entries to a server. They stay in your browser, and you can download or delete them at any time.</li>
+      </ul>
+
+      <div className="cta-inline">
+        <Link to="/app" className="btn btn-primary btn-lg">Open your space<ArrowRight size={20} aria-hidden="true"/></Link>
+      </div>
+    </div>
+  </main>;
+}

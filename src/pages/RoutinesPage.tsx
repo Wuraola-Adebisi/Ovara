@@ -1,30 +1,73 @@
-import { useEffect, useState } from 'react';
-import { usePersistentState } from '../hooks/usePersistentState';
-import { habitsSeed } from '../data/seed';
-import { Check, Droplets, Heart, Plus } from 'lucide-react';
-import { Header } from '../components/PagePrimitives';
-import { localDate, type RoutineCompletion } from '../lib/wellbeing';
+import { useState } from 'react';
+import type { FormEvent } from 'react';
+import { Plus, Trash2 } from 'lucide-react';
+import { useStore } from '../lib/store';
+import { useToday } from '../hooks/useToday';
+import { useUndoRemove } from '../hooks/useUndoRemove';
+import { Card, EmptyState, Meter, PageHeader } from '../components/PagePrimitives';
+
+const times = ['Morning', 'Afternoon', 'Evening', 'Anytime'];
 
 export default function RoutinesPage() {
-  const [items,setItems]=usePersistentState('ovara.habits',habitsSeed);
-  const [habitsDate,setHabitsDate]=usePersistentState('ovara.habitsDate',localDate());
-  const [completions,setCompletions]=usePersistentState<RoutineCompletion[]>('ovara.routineCompletions',[]);
-  const [remaining,setRemaining]=useState(false);
-  const [showForm,setShowForm]=useState(false);
-  const [newTitle,setNewTitle]=useState('');
-  const today=localDate();
-  useEffect(()=>{if(habitsDate!==today){setItems(old=>old.map(item=>({...item,done:false})));setHabitsDate(today);}},[habitsDate,today,setItems,setHabitsDate]);
-  const done=items.filter(x=>x.done).length;
-  function toggleRoutine(id:number,title:string,wasDone:boolean) {
-    setItems(old=>old.map(x=>x.id===id?{...x,done:!x.done}:x));
-    if (wasDone) setCompletions(old=>old.filter(item=>!(item.routineId===id&&item.date===localDate())));
-    else setCompletions(old=>[...old,{id:Date.now(),date:localDate(),routineId:id,title}]);
+  const today = useToday();
+  const [habits, setHabits] = useStore('habits');
+  const [completions, setCompletions] = useStore('completions');
+  const remove = useUndoRemove(habits, setHabits);
+  const [filter, setFilter] = useState<'all' | 'remaining'>('all');
+  const [showForm, setShowForm] = useState(false);
+  const [title, setTitle] = useState('');
+  const [time, setTime] = useState('Anytime');
+
+  // Whether a routine is done is derived from today's completions. There is no
+  // separate "done" flag to reset at midnight.
+  const doneIds = new Set(completions.filter(item => item.date === today).map(item => item.routineId));
+  const doneCount = habits.filter(habit => doneIds.has(habit.id)).length;
+  const visible = habits.filter(habit => filter === 'all' || !doneIds.has(habit.id));
+
+  function toggle(id: number, name: string) {
+    if (doneIds.has(id)) setCompletions(current => current.filter(item => !(item.routineId === id && item.date === today)));
+    else setCompletions(current => [...current, { id: Date.now(), date: today, routineId: id, title: name }]);
   }
+  function addRoutine(event: FormEvent) {
+    event.preventDefault();
+    if (!title.trim()) return;
+    setHabits(current => [...current, { id: Date.now(), title: title.trim(), detail: '', time }]);
+    setTitle(''); setTime('Anytime'); setShowForm(false);
+  }
+
   return <div className="stack">
-    <Header tag="HABITS & SELF-CARE" title="Make room for what matters." desc="Create gentle structure around the things that help you feel good." action={<button className="btn dark" onClick={()=>setShowForm(value=>!value)}><Plus size={16}/> Add a routine</button>}/>
-    {showForm&&<form className="panel activity-form" onSubmit={event=>{event.preventDefault();if(!newTitle.trim())return;setItems(old=>[...old,{id:Date.now(),title:newTitle.trim(),detail:'A routine you want to build',time:'Anytime',done:false}]);setNewTitle('');setShowForm(false)}}><div className="panel-title"><div><label>NEW ROUTINE</label><h3>What would you like to make time for?</h3></div><button type="button" className="btn outline small" onClick={()=>setShowForm(false)}>Cancel</button></div><div className="form-grid"><label>Routine name<input value={newTitle} onChange={event=>setNewTitle(event.target.value)} placeholder="e.g. Read for 15 minutes" required/></label></div><button className="btn dark" type="submit">Save routine</button></form>}
-    <section className="routine-banner"><div><label>YOUR DAILY RHYTHM</label><h2>You're building consistency.</h2><p>Small actions, repeated with care, can become meaningful change.</p></div><strong>{done}<small>/{items.length}</small><span>completed today</span></strong></section>
-    <div className="section-head"><div><label>YOUR ROUTINES</label><h2>Today's list</h2></div><button className="btn outline small" onClick={()=>setRemaining(v=>!v)}>{remaining?'Show all':'Show remaining'}</button></div>
-    <article className="panel routine-full">{items.filter(x=>remaining?!x.done:true).map((h,i)=><button className="habit full-habit" key={h.id} onClick={()=>toggleRoutine(h.id,h.title,h.done)}><span className="metric-icon mint">{i%2===0?<Droplets size={18}/>:<Heart size={18}/>}</span><span><b>{h.title}</b><small>{h.detail}</small></span><small className="habit-time">{h.time}</small><span className={h.done?'check checked':'check'}>{h.done&&<Check size={12}/>}</span></button>)}</article>
+    <PageHeader title="Routines" desc="Small things you want to do regularly. Ticks reset each day and your history is kept." action={<button type="button" className="btn btn-primary" aria-expanded={showForm} onClick={() => setShowForm(value => !value)}><Plus size={18} aria-hidden="true"/>Add a routine</button>}/>
+
+    {showForm && <form className="card form-card" onSubmit={addRoutine}>
+      <div className="card-head"><h2>Add a routine</h2></div>
+      <div className="form-grid">
+        <label className="field">Routine<input value={title} onChange={event => setTitle(event.target.value)} placeholder="Read for 15 minutes" required autoComplete="off"/></label>
+        <label className="field">Time of day<select value={time} onChange={event => setTime(event.target.value)}>{times.map(item => <option key={item}>{item}</option>)}</select></label>
+      </div>
+      <div className="btn-row"><button type="submit" className="btn btn-primary">Save routine</button><button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Cancel</button></div>
+    </form>}
+
+    <Card>
+      <p className="big-number">{doneCount}<small> of {habits.length} done today</small></p>
+      <Meter value={doneCount} max={habits.length} label="Routines done today"/>
+    </Card>
+
+    <Card title="Today's list" action={<div className="segmented" role="group" aria-label="Filter routines">
+      <button type="button" aria-pressed={filter === 'all'} onClick={() => setFilter('all')}>All</button>
+      <button type="button" aria-pressed={filter === 'remaining'} onClick={() => setFilter('remaining')}>Remaining</button>
+    </div>}>
+      {habits.length === 0 ? <EmptyState title="No routines yet" body="Add one above, for example a short walk or reading before bed."/> :
+        visible.length === 0 ? <p className="muted">Everything on the list is done for today.</p> :
+        <ul className="rows">
+          {visible.map(habit => <li className="row" key={habit.id}>
+            <label className="check-row">
+              <input type="checkbox" checked={doneIds.has(habit.id)} onChange={() => toggle(habit.id, habit.title)}/>
+              <span className="check-box" aria-hidden="true"/>
+              <span className="check-text"><b>{habit.title}</b><small>{[habit.time, habit.detail].filter(Boolean).join(', ')}</small></span>
+            </label>
+            <button type="button" className="icon-btn" aria-label={'Remove ' + habit.title} onClick={() => remove(habit.id, habit.title)}><Trash2 size={18}/></button>
+          </li>)}
+        </ul>}
+    </Card>
   </div>;
 }

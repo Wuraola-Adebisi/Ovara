@@ -6,21 +6,21 @@ Ovara brings everyday wellbeing into one thoughtful space: movement, nourishment
 
 ## What's included
 
-- A visual public homepage with an editorial wellness identity and photography.
-- About, Contact, Privacy and Terms pages.
-- A personal wellbeing space with profile setup and preferences.
-- Activity logging and a seven-day movement view.
-- Meal notes and hydration tracking, without a compulsory calorie target.
-- Custom routines and completion tracking.
-- Mood check-ins and a personal journal.
-- Browser-based saving so entries remain available in the same browser.
+- A public site: home, approach, contact, privacy and terms pages.
+- A setup step for name, optional email, goals and the areas to track.
+- Today page with step, water and routine progress, a weekly steps chart and a mood check-in.
+- Activity log with duration, optional steps and distance.
+- Food notes with optional energy estimates, and a water log.
+- Routines with daily ticks and kept history, a daily journal, goals, insights and a calendar.
+- Preferences for units, targets and browser reminders, plus download and reset of all data.
+- Everything saves in the browser on the current device.
 
 ## Stack
 
-- React 18 + TypeScript + Vite
-- Tailwind CSS v4 (Vite plugin)
-- React Router
-- Lucide React
+- React 18, TypeScript and Vite
+- Tailwind CSS v4 (Vite plugin), with design tokens in `src/index.css`
+- React Router and Lucide React
+- Bricolage Grotesque and Figtree, bundled through Fontsource (no third-party font requests)
 
 ## Run locally
 
@@ -51,9 +51,13 @@ npm run build
 
 A GitHub Actions workflow also runs the TypeScript and Vite build check on pushes and pull requests to `main`.
 
+## Deploying on Vercel
+
+`vercel.json` rewrites every path to `index.html` so direct links such as `/app/insights` work after a refresh.
+
 ## Saved information
 
-The personal space currently saves profile details and entries in browser storage on the device being used. There is no cross-device sync or cloud backup. The Privacy page explains this clearly. Clear the website's local storage or use **Reset your space** to start over.
+The personal space currently saves profile details and entries in browser storage on the device being used. There is no cross-device sync or cloud backup. The Privacy page explains this clearly. Clear the website's local storage or use **Reset my space** on the Preferences page. **Download my data** saves a JSON copy first.
 
 ## Product principles
 

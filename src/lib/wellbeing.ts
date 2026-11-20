@@ -1,18 +1,11 @@
-import type { ActivityRecord, Habit, Meal } from '../data/seed';
+import type {
+  ActivityRecord, GoalCategory, GoalPeriod, JournalEntry, Meal, Preferences,
+  RoutineCompletion, WaterEntry, WellbeingGoal,
+} from './types';
 
-export type WaterEntry = { id: number; date: string; ml: number; time: string };
-export type JournalEntry = { id: number; date: string; mood: string; note: string; createdAt: string };
-export type RoutineCompletion = { id: number; date: string; routineId: number; title: string };
-export type GoalCategory = 'steps' | 'activity_minutes' | 'water_ml' | 'routine_completions' | 'journal_entries';
-export type GoalPeriod = 'daily' | 'weekly' | 'monthly';
-export type WellbeingGoal = { id: number; title: string; category: GoalCategory; target: number; period: GoalPeriod; createdAt: string };
-export type ReminderKind = 'routine' | 'hydration' | 'reflection' | 'movement' | 'custom';
-export type WellbeingReminder = { id: number; title: string; kind: ReminderKind; time: string; enabled: boolean; days: number[] };
-export type Preferences = { distanceUnit: 'km' | 'mi'; energyUnit: 'kcal' | 'kj'; waterUnit: 'ml' | 'oz'; dailyWaterTargetMl: number; dailyStepTarget: number; weekStartsOn: 0 | 1 };
+export * from './types';
 
-export const defaultPreferences: Preferences = {
-  distanceUnit: 'km', energyUnit: 'kcal', waterUnit: 'ml', dailyWaterTargetMl: 2000, dailyStepTarget: 7000, weekStartsOn: 1,
-};
+// ---------- Dates ----------
 
 export function localDate(date = new Date()) {
   return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, '0'), String(date.getDate()).padStart(2, '0')].join('-');
@@ -28,13 +21,24 @@ export function shiftDate(date: Date, amount: number) {
   return next;
 }
 
+export function formatDay(key: string, options: Intl.DateTimeFormatOptions) {
+  return dateFromKey(key).toLocaleDateString(undefined, options);
+}
+
+/** The last `count` days ending today, oldest first. */
+export function lastDays(count: number, now = new Date()) {
+  return Array.from({ length: count }, (_, index) => {
+    const date = shiftDate(now, index - (count - 1));
+    return { key: localDate(date), date };
+  });
+}
+
 export function startOfPeriod(date: Date, period: GoalPeriod, weekStartsOn: 0 | 1 = 1) {
   const start = new Date(date);
   start.setHours(0, 0, 0, 0);
   if (period === 'daily') return start;
   if (period === 'weekly') {
-    const day = (start.getDay() - weekStartsOn + 7) % 7;
-    start.setDate(start.getDate() - day);
+    start.setDate(start.getDate() - ((start.getDay() - weekStartsOn + 7) % 7));
     return start;
   }
   start.setDate(1);
@@ -60,39 +64,97 @@ export function getMealDate(meal: Meal) {
   return meal.date || localDate();
 }
 
-export function collectEvents(data: {
-  activities: ActivityRecord[];
-  meals: Meal[];
-  water: WaterEntry[];
-  journals: JournalEntry[];
-  completions: RoutineCompletion[];
-}) {
+export function greetingFor(date = new Date()) {
+  const hour = date.getHours();
+  if (hour < 12) return 'Good morning';
+  if (hour < 18) return 'Good afternoon';
+  return 'Good evening';
+}
+
+// ---------- Units ----------
+
+export const GLASS_ML = 250;
+const ML_PER_OZ = 29.5735;
+const KCAL_TO_KJ = 4.184;
+const KM_PER_MILE = 1.60934;
+
+export function formatWater(ml: number, unit: Preferences['waterUnit']) {
+  if (unit === 'oz') return { value: (ml / ML_PER_OZ).toFixed(1).replace(/\.0$/, ''), unit: 'fl oz' };
+  return { value: Math.round(ml).toLocaleString(), unit: 'ml' };
+}
+
+export function waterToMl(value: number, unit: Preferences['waterUnit']) {
+  return unit === 'oz' ? Math.round(value * ML_PER_OZ) : Math.round(value);
+}
+
+/** Energy is always stored as kcal and converted for display. */
+export function kcalToDisplay(kcal: number, unit: Preferences['energyUnit']) {
+  return unit === 'kj' ? Math.round(kcal * KCAL_TO_KJ) : Math.round(kcal);
+}
+
+export function displayToKcal(value: number, unit: Preferences['energyUnit']) {
+  return unit === 'kj' ? Math.round(value / KCAL_TO_KJ) : Math.round(value);
+}
+
+/** Distance is always stored as km and converted for display. */
+export function kmToDisplay(km: number, unit: Preferences['distanceUnit']) {
+  return unit === 'mi' ? km / KM_PER_MILE : km;
+}
+
+export function displayToKm(value: number, unit: Preferences['distanceUnit']) {
+  return unit === 'mi' ? value * KM_PER_MILE : value;
+}
+
+// ---------- Mood ----------
+
+// 'Anxious' is a feeling rather than a point on a low-to-high scale, so it has
+// no score and is left out of averages. 'Low' is kept for older entries.
+const moodScores: Record<string, number | null> = {
+  Great: 5, Good: 4, Okay: 3, 'A little low': 2, 'Not great': 1, Low: 1, Anxious: null,
+};
+
+export function moodScore(label: string) {
+  return moodScores[label] ?? null;
+}
+
+// ---------- Aggregates ----------
+
+type Data = {
+  activities: ActivityRecord[]; meals: Meal[]; water: WaterEntry[]; journals: JournalEntry[]; completions: RoutineCompletion[];
+};
+
+export function sumFor<T extends { date: string }>(items: T[], key: string, pick: (item: T) => number) {
+  return items.filter(item => item.date === key).reduce((sum, item) => sum + pick(item), 0);
+}
+
+export function collectEvents(data: Data, preferences: Preferences) {
   const events: { id: string; date: string; type: 'activity' | 'meal' | 'water' | 'journal' | 'routine'; title: string; detail: string }[] = [];
-  data.activities.forEach(item => events.push({ id: 'activity-' + item.id, date: item.date, type: 'activity', title: item.name, detail: item.minutes + ' min movement' }));
+  data.activities.forEach(item => events.push({ id: 'activity-' + item.id, date: item.date, type: 'activity', title: item.name, detail: item.minutes + ' min' }));
   data.meals.forEach(item => events.push({ id: 'meal-' + item.id, date: getMealDate(item), type: 'meal', title: item.name, detail: item.kind }));
-  data.water.forEach(item => events.push({ id: 'water-' + item.id, date: item.date, type: 'water', title: 'Water check-in', detail: item.ml + ' ml' }));
-  data.journals.forEach(item => events.push({ id: 'journal-' + item.id, date: item.date, type: 'journal', title: 'Journal reflection', detail: item.mood }));
-  data.completions.forEach(item => events.push({ id: 'routine-' + item.id, date: item.date, type: 'routine', title: item.title, detail: 'Routine completed' }));
+  const waterByDay = new Map<string, number>();
+  data.water.forEach(item => waterByDay.set(item.date, (waterByDay.get(item.date) || 0) + item.ml));
+  waterByDay.forEach((ml, date) => {
+    const { value, unit } = formatWater(ml, preferences.waterUnit);
+    events.push({ id: 'water-' + date, date, type: 'water', title: 'Water', detail: value + ' ' + unit });
+  });
+  data.journals.forEach(item => events.push({ id: 'journal-' + item.id, date: item.date, type: 'journal', title: 'Journal', detail: item.mood }));
+  data.completions.forEach(item => events.push({ id: 'routine-' + item.id, date: item.date, type: 'routine', title: item.title, detail: 'Routine done' }));
   return events.sort((a, b) => b.date.localeCompare(a.date));
 }
 
-export function getGoalValue(goal: WellbeingGoal, data: {
-  activities: ActivityRecord[]; water: WaterEntry[]; journals: JournalEntry[]; completions: RoutineCompletion[];
-}, now = new Date(), weekStartsOn: 0 | 1 = 1) {
-  const start = startOfPeriod(now, goal.period, weekStartsOn);
-  const startKey = localDate(start);
+export function getGoalValue(goal: WellbeingGoal, data: Pick<Data, 'activities' | 'water' | 'journals' | 'completions'>, now = new Date(), weekStartsOn: 0 | 1 = 1) {
+  const startKey = localDate(startOfPeriod(now, goal.period, weekStartsOn));
   const endKey = localDate(now);
-  const activities = data.activities.filter(item => item.date >= startKey && item.date <= endKey);
+  const within = <T extends { date: string }>(items: T[]) => items.filter(item => item.date >= startKey && item.date <= endKey);
+  const activities = within(data.activities);
   if (goal.category === 'steps') return activities.reduce((sum, item) => sum + item.steps, 0);
   if (goal.category === 'activity_minutes') return activities.reduce((sum, item) => sum + item.minutes, 0);
-  if (goal.category === 'water_ml') return data.water.filter(item => item.date >= startKey && item.date <= endKey).reduce((sum, item) => sum + item.ml, 0);
-  if (goal.category === 'routine_completions') return data.completions.filter(item => item.date >= startKey && item.date <= endKey).length;
-  return data.journals.filter(item => item.date >= startKey && item.date <= endKey).length;
+  if (goal.category === 'water_ml') return within(data.water).reduce((sum, item) => sum + item.ml, 0);
+  if (goal.category === 'routine_completions') return within(data.completions).length;
+  return within(data.journals).length;
 }
 
-export function getRangeStats(period: 'week' | 'month', data: {
-  activities: ActivityRecord[]; meals: Meal[]; water: WaterEntry[]; journals: JournalEntry[]; completions: RoutineCompletion[];
-}, now = new Date()) {
+export function getRangeStats(period: 'week' | 'month', data: Data, now = new Date()) {
   const { start, end } = getDateRange(period, now);
   const inRange = (key: string) => dateInRange(key, start, end);
   const activities = data.activities.filter(item => inRange(item.date));
@@ -100,44 +162,56 @@ export function getRangeStats(period: 'week' | 'month', data: {
   const water = data.water.filter(item => inRange(item.date));
   const journals = data.journals.filter(item => inRange(item.date));
   const completions = data.completions.filter(item => inRange(item.date));
-  const activeDays = new Set(activities.map(item => item.date)).size;
-  const waterByDay = new Map<string, number>();
-  water.forEach(item => waterByDay.set(item.date, (waterByDay.get(item.date) || 0) + item.ml));
-  const moodValues: Record<string, number> = { Low: 1, 'Not great': 1, 'A little low': 2, Okay: 3, Good: 4, Great: 5, Anxious: 2 };
-  const moods = journals.map(item => moodValues[item.mood] || 0).filter(Boolean);
+  const moods = journals.map(item => moodScore(item.mood)).filter((score): score is number => score !== null);
   return {
-    activities, meals, water, journals, completions, activeDays,
+    activities, meals, water, journals, completions,
+    activeDays: new Set(activities.map(item => item.date)).size,
+    waterDays: new Set(water.map(item => item.date)).size,
     steps: activities.reduce((sum, item) => sum + item.steps, 0),
     minutes: activities.reduce((sum, item) => sum + item.minutes, 0),
     waterMl: water.reduce((sum, item) => sum + item.ml, 0),
     mealCount: meals.length,
     routineCount: completions.length,
-    moodAverage: moods.length ? moods.reduce((sum, item) => sum + item, 0) / moods.length : null,
-    waterByDay,
+    moodAverage: moods.length ? moods.reduce((sum, score) => sum + score, 0) / moods.length : null,
   };
 }
 
-export function buildLocalInsights(stats: ReturnType<typeof getRangeStats>, period: 'week' | 'month') {
-  const label = period === 'week' ? 'this week' : 'this month';
-  const insights: { title: string; body: string; tone: 'sage' | 'clay' | 'sand' }[] = [];
+export type RangeStats = ReturnType<typeof getRangeStats>;
+export type InsightCard = { title: string; body: string };
+
+export function buildLocalInsights(stats: RangeStats, period: 'week' | 'month', preferences: Preferences): InsightCard[] {
+  const label = period === 'week' ? 'in the last 7 days' : 'this month';
+  const plural = (count: number, one: string, many: string) => count === 1 ? one : many;
+  const insights: InsightCard[] = [];
   if (stats.activities.length) {
-    insights.push({ title: 'Movement is adding up', body: `You logged ${stats.minutes} active minutes across ${stats.activeDays} ${stats.activeDays === 1 ? 'day' : 'days'} ${label}. Small sessions count, too.`, tone: 'sage' });
+    const byDay = new Map<string, number>();
+    stats.activities.forEach(item => byDay.set(item.date, (byDay.get(item.date) || 0) + item.minutes));
+    const [bestDay, bestMinutes] = [...byDay.entries()].sort((a, b) => b[1] - a[1])[0];
+    insights.push({
+      title: 'Movement',
+      body: `You logged ${stats.minutes} active minutes on ${stats.activeDays} ${plural(stats.activeDays, 'day', 'days')} ${label}. Your longest day was ${formatDay(bestDay, { weekday: 'long' })}, with ${bestMinutes} minutes.`,
+    });
   }
   if (stats.water.length) {
-    const days = new Set(stats.water.map(item => item.date)).size;
-    insights.push({ title: 'Hydration check-in', body: `You recorded ${(stats.waterMl / 1000).toFixed(1)} litres of water over ${days} ${days === 1 ? 'day' : 'days'}. Look for a rhythm that fits your day.`, tone: 'clay' });
+    const { value, unit } = formatWater(stats.waterMl, preferences.waterUnit);
+    insights.push({ title: 'Water', body: `You recorded ${value} ${unit} across ${stats.waterDays} ${plural(stats.waterDays, 'day', 'days')} ${label}.` });
   }
   if (stats.moodAverage !== null) {
-    insights.push({ title: 'Make room for reflection', body: `You checked in ${stats.journals.length} ${stats.journals.length === 1 ? 'time' : 'times'} ${label}. Your recorded mood average is ${stats.moodAverage.toFixed(1)} out of 5; it is a prompt for reflection, not a score.`, tone: 'sand' });
+    insights.push({
+      title: 'Mood',
+      body: `You checked in ${stats.journals.length} ${plural(stats.journals.length, 'time', 'times')} ${label}. The average of your scored moods is ${stats.moodAverage.toFixed(1)} out of 5. Treat it as a prompt to reflect, not a grade.`,
+    });
   }
   if (stats.routineCount) {
-    insights.push({ title: 'Consistency, on your terms', body: `You completed ${stats.routineCount} routine ${stats.routineCount === 1 ? 'check-in' : 'check-ins'} ${label}. Notice which routines feel easiest to return to.`, tone: 'sage' });
+    insights.push({ title: 'Routines', body: `You completed ${stats.routineCount} routine ${plural(stats.routineCount, 'check-in', 'check-ins')} ${label}.` });
   }
   if (stats.mealCount) {
-    insights.push({ title: 'Nourishment notes', body: `You noted ${stats.mealCount} meals or snacks ${label}. Patterns become more useful as you log at a pace that feels sustainable.`, tone: 'clay' });
+    insights.push({ title: 'Food notes', body: `You noted ${stats.mealCount} ${plural(stats.mealCount, 'meal or snack', 'meals and snacks')} ${label}.` });
   }
-  if (!insights.length) insights.push({ title: 'Your picture is still taking shape', body: 'As you add movement, meals, water and reflections, Ovara will be able to surface patterns from your own records here.', tone: 'sand' });
+  if (!insights.length) {
+    insights.push({ title: 'Nothing to show yet', body: 'Log some movement, water, food or a mood check-in and your patterns will show up here. Everything is calculated on this device from your own entries.' });
+  }
   return insights;
 }
 
-export type { ActivityRecord, Habit, Meal };
+export type { GoalCategory };

@@ -1,13 +1,8 @@
 import { createContext, useContext } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
+import type { UserProfile } from '../lib/types';
 
-export type UserProfile = {
-  name: string;
-  email: string;
-  goals: string[];
-  interests: string[];
-  createdAt: string;
-};
+export type { UserProfile };
 
 type ProfileContextValue = {
   profile: UserProfile | null;

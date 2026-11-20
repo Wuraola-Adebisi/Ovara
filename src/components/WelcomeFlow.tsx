@@ -1,12 +1,24 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { Activity, ArrowRight, Check } from 'lucide-react';
-import type { UserProfile } from '../context/ProfileContext';
+import { ArrowRight } from 'lucide-react';
+import type { UserProfile } from '../lib/types';
+import Wordmark from './Wordmark';
+import { usePageTitle } from './PagePrimitives';
 
 const goals = ['Feel more balanced', 'Build consistent routines', 'Move more often', 'Eat more mindfully', 'Improve my sleep', 'Understand my wellbeing'];
-const interests = ['Movement', 'Nutrition', 'Hydration', 'Routines', 'Reflection', 'Rest'];
+const interests = ['Movement', 'Nutrition', 'Hydration', 'Routines', 'Reflection'];
+
+function ChoiceGroup({ legend, options, selected, onToggle }: { legend: string; options: string[]; selected: string[]; onToggle: (value: string) => void }) {
+  return <fieldset className="choice-group">
+    <legend>{legend}</legend>
+    <div className="choice-grid">
+      {options.map(option => <label className="choice" key={option}><input type="checkbox" checked={selected.includes(option)} onChange={() => onToggle(option)}/><span>{option}</span></label>)}
+    </div>
+  </fieldset>;
+}
 
 export default function WelcomeFlow({ onComplete }: { onComplete: (profile: UserProfile) => void }) {
+  usePageTitle('Set up your space');
   const [step, setStep] = useState(0);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -14,27 +26,42 @@ export default function WelcomeFlow({ onComplete }: { onComplete: (profile: User
   const [selectedInterests, setSelectedInterests] = useState<string[]>(['Movement', 'Nutrition', 'Routines']);
   const [error, setError] = useState('');
 
-  function toggle(value: string, selected: string[], setter: (values: string[]) => void) {
-    setter(selected.includes(value) ? selected.filter(item => item !== value) : [...selected, value]);
-  }
+  const toggle = (value: string, list: string[], setList: (values: string[]) => void) => setList(list.includes(value) ? list.filter(item => item !== value) : [...list, value]);
 
-  function submit(event: FormEvent) {
+  function next(event: FormEvent) {
     event.preventDefault();
-    if (!name.trim() || !email.trim()) {
-      setError('Add your name and email to continue.');
-      return;
-    }
-    if (!/^\S+@\S+\.\S+$/.test(email)) {
-      setError('Enter a valid email address.');
-      return;
-    }
+    if (!name.trim()) { setError('Enter a name so Ovara knows what to call you.'); return; }
+    if (email.trim() && !/^\S+@\S+\.\S+$/.test(email.trim())) { setError('That email address looks incomplete. Fix it or leave the field empty.'); return; }
     setError('');
     setStep(1);
   }
 
-  function finish() {
+  function finish(event: FormEvent) {
+    event.preventDefault();
     onComplete({ name: name.trim(), email: email.trim().toLowerCase(), goals: selectedGoals, interests: selectedInterests, createdAt: new Date().toISOString() });
   }
 
-  return <main className="welcome-screen"><section className="welcome-card"><div className="welcome-brand"><span className="brand-icon"><Activity size={19}/></span><b>ovara<span>.</span></b></div>{step === 0 ? <form onSubmit={submit}><label className="welcome-eyebrow">A SPACE FOR YOUR WELLBEING</label><h1>Make room for a better everyday.</h1><p>Start by creating your personal space. You can update your details and preferences later.</p><label className="welcome-label" htmlFor="profile-name">What should we call you?</label><input id="profile-name" value={name} onChange={event => setName(event.target.value)} placeholder="Your name" autoComplete="name" required/><label className="welcome-label" htmlFor="profile-email">Email address</label><input id="profile-email" type="email" value={email} onChange={event => setEmail(event.target.value)} placeholder="you@example.com" autoComplete="email" required/>{error && <p className="welcome-error">{error}</p>}<button className="btn dark welcome-submit" type="submit">Continue <ArrowRight size={16}/></button><small className="welcome-note">A personal space for the things that help you feel well.</small></form> : <div><label className="welcome-eyebrow">LET'S MAKE IT YOURS</label><h1>What would you like to focus on?</h1><p>Choose what matters to you. There are no right or wrong answers.</p><label className="welcome-label">Your wellbeing goals</label><div className="choice-grid">{goals.map(goal => <button type="button" key={goal} className={selectedGoals.includes(goal) ? 'choice selected' : 'choice'} onClick={() => toggle(goal, selectedGoals, setSelectedGoals)}><span>{selectedGoals.includes(goal) && <Check size={13}/>}</span>{goal}</button>)}</div><label className="welcome-label">Areas you want to track</label><div className="choice-grid">{interests.map(item => <button type="button" key={item} className={selectedInterests.includes(item) ? 'choice selected' : 'choice'} onClick={() => toggle(item, selectedInterests, setSelectedInterests)}><span>{selectedInterests.includes(item) && <Check size={13}/>}</span>{item}</button>)}</div><div className="welcome-actions"><button className="btn outline" onClick={() => setStep(0)}>Back</button><button className="btn dark" onClick={finish}>Enter Ovara <ArrowRight size={16}/></button></div></div>}</section><p className="welcome-footer">A more considered way to care for yourself.</p></main>;
+  return <main className="welcome" id="main">
+    <div className="welcome-card">
+      <Wordmark/>
+      {step === 0 ? <form key="step-details" onSubmit={next} noValidate>
+        <h1>Set up your space</h1>
+        <p className="muted">Your entries stay in this browser. Nothing is sent to a server.</p>
+        <label className="field">What should we call you?<input value={name} onChange={event => setName(event.target.value)} autoComplete="given-name" aria-invalid={Boolean(error) && !name.trim()} aria-describedby={error ? 'welcome-error' : undefined} autoFocus/></label>
+        <label className="field">Email (optional)<input type="email" value={email} onChange={event => setEmail(event.target.value)} autoComplete="email" aria-describedby="email-help"/><small id="email-help">Only used to show your details here. Leave it empty if you prefer.</small></label>
+        {error && <p className="form-error" id="welcome-error" role="alert">{error}</p>}
+        <button type="submit" className="btn btn-primary btn-block">Continue<ArrowRight size={18} aria-hidden="true"/></button>
+      </form> : <form key="step-focus" onSubmit={finish}>
+        <h1>What do you want to focus on?</h1>
+        <p className="muted">Pick anything that applies. You can skip this.</p>
+        <ChoiceGroup legend="Your goals" options={goals} selected={selectedGoals} onToggle={value => toggle(value, selectedGoals, setSelectedGoals)}/>
+        <ChoiceGroup legend="What you want to track" options={interests} selected={selectedInterests} onToggle={value => toggle(value, selectedInterests, setSelectedInterests)}/>
+        <p className="muted small-print">The areas you pick lead on your Today page. Every page stays available.</p>
+        <div className="btn-row">
+          <button type="button" className="btn btn-secondary" onClick={() => setStep(0)}>Back</button>
+          <button type="submit" className="btn btn-primary">Open my space<ArrowRight size={18} aria-hidden="true"/></button>
+        </div>
+      </form>}
+    </div>
+  </main>;
 }
