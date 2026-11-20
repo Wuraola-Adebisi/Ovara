@@ -52,7 +52,7 @@ export function resetAllData() {
   Object.keys(window.localStorage).filter(key => key.startsWith('ovara.')).forEach(key => window.localStorage.removeItem(key));
 }
 
-const knownKeys = new Set(Object.values(stores).map(store => store.key));
+const knownKeys = new Set<string>(Object.values(stores).map(store => store.key));
 
 /** Validate an Ovara data download before optionally restoring it. */
 export function importAllData(text: string, apply: boolean): { ok: true; keys: number } | { ok: false; error: string } {
@@ -62,7 +62,7 @@ export function importAllData(text: string, apply: boolean): { ok: true; keys: n
   if (!data || typeof data !== 'object' || Array.isArray(data)) return { ok: false, error: 'That file does not look like an Ovara data download.' };
   const entries = Object.entries(data).filter(([key]) => knownKeys.has(key) || key.startsWith('ovara.reminderSent.'));
   if (entries.length === 0) return { ok: false, error: 'That file has no Ovara data in it.' };
-  const arrayKeys = new Set(Object.values(stores).filter(store => Array.isArray(store.initial)).map(store => store.key));
+  const arrayKeys = new Set<string>(Object.values(stores).filter(store => Array.isArray(store.initial)).map(store => store.key));
   for (const [key, value] of entries) {
     if (arrayKeys.has(key) && !Array.isArray(value)) return { ok: false, error: 'The file has damaged data for ' + key.replace('ovara.', '') + '.' };
   }
