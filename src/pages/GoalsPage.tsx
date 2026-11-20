@@ -50,7 +50,7 @@ export default function GoalsPage() {
     setEditingGoalId(goal.id);
     setTitle(goal.title);
     setCategory(goal.category);
-    setTarget(goal.category === 'water_ml' && preferences.waterUnit === 'oz' ? String(Number(formatWater(goal.target, 'oz').value)) : String(goal.target));
+    setTarget(goal.category === 'water_ml' && preferences.waterUnit === 'oz' ? String(Number((goal.target / 29.5735).toFixed(2))) : String(goal.target));
     setPeriod(goal.period);
     setShowForm(true);
   }
@@ -92,7 +92,7 @@ export default function GoalsPage() {
   }
 
   return <div className="stack">
-    <PageHeader title="Goals" desc="Targets you set for yourself. Track progress across each period." action={<button type="button" className="btn btn-primary" aria-expanded={showForm} onClick={() => setShowForm(value => !value)}><Plus size={18} aria-hidden="true"/>Add a goal</button>}/>
+    <PageHeader title="Goals" desc="Targets you set for yourself. Track progress across each period." action={<button type="button" className="btn btn-primary" aria-expanded={showForm} onClick={() => { if (showForm) resetForm(); else { resetForm(); setShowForm(true); } }}><Plus size={18} aria-hidden="true"/>Add a goal</button>}/>
     <PageFeature eyebrow="Choose a direction that feels right" text="Goals give your intentions a little structure. Review your progress over time and adjust your targets when your priorities change." image="https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=1200&q=85" imageAlt="A notebook and planner laid out for thoughtful goal setting" />
 
     {showForm && <form className="card form-card" onSubmit={saveGoal}>
