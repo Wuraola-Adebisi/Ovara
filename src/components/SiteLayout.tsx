@@ -20,10 +20,9 @@ export default function SiteLayout() {
         <Link to="/" className="wordmark-link" aria-label="Ovara, home"><Wordmark/></Link>
         <button type="button" className="icon-btn menu-toggle" aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} aria-controls="site-nav" onClick={() => setMenuOpen(value => !value)}>{menuOpen ? <X size={22}/> : <Menu size={22}/>}</button>
         <nav id="site-nav" className={menuOpen ? 'site-nav is-open' : 'site-nav'} aria-label="Main">
-          <NavLink to="/features">Explore</NavLink>
-          <NavLink to="/about">Our approach</NavLink>
+          <NavLink to="/features">Features</NavLink>
+          <NavLink to="/about">About</NavLink>
           <NavLink to="/help">Help</NavLink>
-          <NavLink to="/contact">Contact</NavLink>
           <Link className="btn btn-primary" to="/app">Get started</Link>
         </nav>
       </div>
@@ -37,7 +36,7 @@ export default function SiteLayout() {
         </div>
         <nav aria-label="Explore Ovara">
           <b>Explore</b>
-          <Link to="/features">What you can do</Link>
+          <Link to="/features">Features</Link>
           <Link to="/app">Your space</Link>
           <Link to="/#how-it-works">How it works</Link>
         </nav>
