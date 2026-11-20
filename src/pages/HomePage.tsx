@@ -36,7 +36,7 @@ export default function HomePage() {
             <Link to="/app" className="btn btn-primary btn-lg">Find your rhythm<ArrowRight size={20} aria-hidden="true"/></Link>
             <Link to="/features" className="home-text-link">Take a look around</Link>
           </div>
-          <div className="home-reassurance"><span><Check size={15} aria-hidden="true"/> No pressure to be perfect</span><span><Check size={15} aria-hidden="true"/> Your notes stay on your device</span></div>
+          <div className="home-reassurance"><span><Check size={15} aria-hidden="true"/> No pressure to be perfect</span></div>
         </div>
         <div className="home-hero-visual">
           <img className="home-hero-image" src="https://images.pexels.com/photos/8497696/pexels-photo-8497696.jpeg?auto=compress&cs=tinysrgb&w=1800" alt="A woman taking a relaxed walk outdoors" fetchPriority="high"/>
@@ -98,7 +98,7 @@ export default function HomePage() {
       <div className="container">
         <div className="section-heading-row"><div><span className="eyebrow">Simple by design</span><h2 className="section-title">A little at a time.</h2></div><p>Ovara is here to support your own rhythm, not give you another thing to keep up with.</p></div>
         <ol className="steps">{steps.map(([title, body], index) => <li key={title}><span className="step-number">{index + 1}</span><h3>{title}</h3><p>{body}</p></li>)}</ol>
-        <div className="data-panel"><h3>Your information stays close</h3><p>Your notes and activity are saved in this browser on this device. Nothing is uploaded to an Ovara account. You can download a copy to keep or move your information to another device.</p><Link className="text-link" to="/privacy">Read about your privacy<ArrowRight size={16} aria-hidden="true"/></Link></div>
+        <div className="data-panel"><h3>Your space, your choices</h3><p>Choose what feels useful, leave the rest, and change your mind whenever you need to.</p><Link className="text-link" to="/about">Our approach<ArrowRight size={16} aria-hidden="true"/></Link></div>
       </div>
     </section>
 
