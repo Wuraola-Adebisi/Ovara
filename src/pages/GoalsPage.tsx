@@ -112,6 +112,6 @@ export default function GoalsPage() {
           })}
         </ul>}
     </Card>
-    <p className="muted small-print">Your goals are personal targets, not health recommendations. Adjust them whenever your priorities or circumstances change.</p>
+    <p className="muted small-print">Choose targets that feel realistic for you, and adjust them as your priorities change.</p>
   </div>;
 }
