@@ -12,6 +12,8 @@ import Wordmark from './components/Wordmark';
 import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
+import FeaturesPage from './pages/FeaturesPage';
+import HelpPage from './pages/HelpPage';
 import TermsPage from './pages/TermsPage';
 import PrivacyPage from './pages/PrivacyPage';
 import NotFoundPage from './pages/NotFoundPage';
@@ -113,6 +115,8 @@ export default function App() {
     <Route element={<SiteLayout/>}>
       <Route index element={<HomePage/>}/>
       <Route path="about" element={<AboutPage/>}/>
+      <Route path="features" element={<FeaturesPage/>}/>
+      <Route path="help" element={<HelpPage/>}/>
       <Route path="contact" element={<ContactPage/>}/>
       <Route path="terms" element={<TermsPage/>}/>
       <Route path="privacy" element={<PrivacyPage/>}/>

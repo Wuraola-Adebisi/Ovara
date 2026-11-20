@@ -51,3 +51,24 @@ export function exportAllData() {
 export function resetAllData() {
   Object.keys(window.localStorage).filter(key => key.startsWith('ovara.')).forEach(key => window.localStorage.removeItem(key));
 }
+
+const knownKeys = new Set(Object.values(stores).map(store => store.key));
+
+/** Validates a downloaded file. With apply set to true it also replaces the saved data. */
+export function importAllData(text: string, apply: boolean): { ok: true; keys: number } | { ok: false; error: string } {
+  let parsed: unknown;
+  try { parsed = JSON.parse(text); } catch { return { ok: false, error: 'That file is not valid JSON, so it cannot be an Ovara data file.' }; }
+  const data = (parsed as { data?: Record<string, unknown> } | null)?.data;
+  if (!data || typeof data !== 'object') return { ok: false, error: 'That file does not look like an Ovara data download.' };
+  const entries = Object.entries(data).filter(([key]) => knownKeys.has(key as never) || key.startsWith('ovara.reminderSent.'));
+  if (entries.length === 0) return { ok: false, error: 'That file has no Ovara data in it.' };
+  const arrayKeys = new Set(Object.values(stores).filter(store => Array.isArray(store.initial)).map(store => store.key));
+  for (const [key, value] of entries) {
+    if (arrayKeys.has(key as never) && !Array.isArray(value)) return { ok: false, error: 'The file has damaged data for ' + key.replace('ovara.', '') + '.' };
+  }
+  if (apply) {
+    resetAllData();
+    entries.forEach(([key, value]) => window.localStorage.setItem(key, JSON.stringify(value)));
+  }
+  return { ok: true, keys: entries.length };
+}

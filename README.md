@@ -6,13 +6,14 @@ Ovara brings everyday wellbeing into one thoughtful space: movement, nourishment
 
 ## What's included
 
-- A public site: home, approach, contact, privacy and terms pages.
+- A public site: home, features, approach, help, contact, privacy and terms pages.
 - A setup step for name, optional email, goals and the areas to track.
 - Today page with step, water and routine progress, a weekly steps chart and a mood check-in.
 - Activity log with duration, optional steps and distance.
 - Food notes with optional energy estimates, and a water log.
-- Routines with daily ticks and kept history, a daily journal, goals, insights and a calendar.
-- Preferences for units, targets and browser reminders, plus download and reset of all data.
+- Routines with daily ticks and a 7 day history, a journal that can be written for any past day, goals with suggestions, insights that compare with the previous period, and a calendar.
+- Activity, food notes, routines and goals can be edited after saving, and removals offer Undo.
+- Preferences for units, targets and browser reminders, plus download, restore from file and reset of all data.
 - Everything saves in the browser on the current device.
 
 ## Stack
@@ -20,7 +21,7 @@ Ovara brings everyday wellbeing into one thoughtful space: movement, nourishment
 - React 18, TypeScript and Vite
 - Tailwind CSS v4 (Vite plugin), with design tokens in `src/index.css`
 - React Router and Lucide React
-- Bricolage Grotesque and Figtree, bundled through Fontsource (no third-party font requests)
+- Geist (headings) and Inter (body), bundled through Fontsource with no third-party font requests
 
 ## Run locally
 

@@ -215,3 +215,35 @@ export function buildLocalInsights(stats: RangeStats, period: 'week' | 'month', 
 }
 
 export type { GoalCategory };
+
+// ---------- Comparisons and breakdowns ----------
+
+/** The period right before the current one: the previous 7 days, or the previous calendar month. */
+export function getPreviousStats(period: 'week' | 'month', data: Data, now = new Date()) {
+  if (period === 'week') return getRangeStats('week', data, shiftDate(now, -7));
+  return getRangeStats('month', data, new Date(now.getFullYear(), now.getMonth(), 0, 12));
+}
+
+export function deltaText(current: number, previous: number, noun: string) {
+  if (previous === 0 && current === 0) return '';
+  if (previous === 0) return 'Nothing recorded in the period before';
+  const diff = current - previous;
+  if (diff === 0) return 'Same as the period before';
+  return (diff > 0 ? 'Up ' : 'Down ') + Math.abs(diff).toLocaleString() + (noun ? ' ' + noun : '') + ' from the period before';
+}
+
+export function minutesByKind(activities: ActivityRecord[]) {
+  const totals = new Map<string, number>();
+  activities.forEach(item => totals.set(item.kind, (totals.get(item.kind) || 0) + item.minutes));
+  return [...totals.entries()].sort((a, b) => b[1] - a[1]);
+}
+
+export function waterToDisplayNumber(ml: number, unit: Preferences['waterUnit']) {
+  return unit === 'oz' ? Math.round(ml / ML_PER_OZ * 10) / 10 : Math.round(ml);
+}
+
+export function hasEntryOn(key: string, data: Data) {
+  return data.activities.some(item => item.date === key) || data.water.some(item => item.date === key)
+    || data.journals.some(item => item.date === key) || data.completions.some(item => item.date === key)
+    || data.meals.some(item => getMealDate(item) === key);
+}

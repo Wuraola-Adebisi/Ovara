@@ -34,6 +34,9 @@ export default function CalendarPage() {
     return day < 1 || day > count ? null : localDate(new Date(year, monthIndex, day));
   });
   const selectedEvents = eventsByDay.get(selected) ?? [];
+  const monthKeys = cells.filter((key): key is string => Boolean(key));
+  const loggedDays = monthKeys.filter(key => (eventsByDay.get(key) ?? []).length > 0).length;
+  const monthEntries = monthKeys.reduce((sum, key) => sum + (eventsByDay.get(key) ?? []).length, 0);
 
   function changeMonth(amount: number) {
     const next = new Date(year, monthIndex + amount, 1);
@@ -64,6 +67,7 @@ export default function CalendarPage() {
             </button>;
           })}
         </div>
+        <p className="muted">{monthEntries === 0 ? 'Nothing logged this month.' : loggedDays + ' ' + (loggedDays === 1 ? 'day' : 'days') + ' with entries, ' + monthEntries + ' entries in total.'}</p>
         <ul className="legend">{Object.entries(typeLabels).map(([type, label]) => <li key={type}><i className={'dot dot-' + type} aria-hidden="true"/>{label}</li>)}</ul>
       </Card>
       <Card title={formatDay(selected, { weekday: 'long', day: 'numeric', month: 'long' })}>

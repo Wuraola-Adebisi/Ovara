@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { FormEvent } from 'react';
-import { Bell, Download, Trash2 } from 'lucide-react';
-import { exportAllData, resetAllData, useStore } from '../lib/store';
+import { Bell, Download, Trash2, Upload } from 'lucide-react';
+import { exportAllData, importAllData, resetAllData, useStore } from '../lib/store';
 import { useProfile } from '../context/ProfileContext';
 import { useUndoRemove } from '../hooks/useUndoRemove';
 import { useToast } from '../components/Toast';
@@ -22,6 +22,9 @@ export default function SettingsPage() {
   const [reminderTitle, setReminderTitle] = useState('');
   const [reminderTime, setReminderTime] = useState('09:00');
   const [confirmReset, setConfirmReset] = useState(false);
+  const [pendingImport, setPendingImport] = useState<string | null>(null);
+  const [importError, setImportError] = useState('');
+  const fileRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState(profile?.name ?? '');
   const [email, setEmail] = useState(profile?.email ?? '');
 
@@ -67,6 +70,19 @@ export default function SettingsPage() {
     link.download = 'ovara-data-' + new Date().toISOString().slice(0, 10) + '.json';
     link.click();
     URL.revokeObjectURL(url);
+  }
+
+  async function chooseFile(file: File | undefined) {
+    setImportError('');
+    if (!file) return;
+    const text = await file.text();
+    const result = importAllData(text, false);
+    if (!result.ok) { setImportError(result.error); return; }
+    setPendingImport(text);
+  }
+  function confirmImport() {
+    if (pendingImport) importAllData(pendingImport, true);
+    window.location.assign('/app');
   }
 
   function reset() {
@@ -130,11 +146,18 @@ export default function SettingsPage() {
 
     <Card title="Your data">
       <p className="muted">Everything in Ovara is stored in this browser. There is no account and no backup, so download a copy before clearing browser data or switching devices.</p>
+      {importError && <p className="form-error" role="alert">{importError}</p>}
       <div className="btn-row">
         <button type="button" className="btn btn-secondary" onClick={download}><Download size={18} aria-hidden="true"/>Download my data</button>
+        <button type="button" className="btn btn-secondary" onClick={() => fileRef.current?.click()}><Upload size={18} aria-hidden="true"/>Restore from a file</button>
+        <input ref={fileRef} type="file" accept="application/json,.json" hidden aria-label="Choose an Ovara data file" onChange={event => { chooseFile(event.target.files?.[0]); event.target.value = ''; }}/>
         <button type="button" className="btn btn-danger-outline" onClick={() => setConfirmReset(true)}><Trash2 size={18} aria-hidden="true"/>Reset my space</button>
       </div>
     </Card>
+
+    <ConfirmDialog open={pendingImport !== null} title="Replace your data with this file?" confirmLabel="Replace my data" danger onConfirm={confirmImport} onCancel={() => setPendingImport(null)}>
+      <p>This replaces everything in Ovara on this device with the contents of the file. Download your current data first if you may want it back.</p>
+    </ConfirmDialog>
 
     <ConfirmDialog open={confirmReset} title="Reset your space?" confirmLabel="Delete everything" danger onConfirm={reset} onCancel={() => setConfirmReset(false)}>
       <p>This deletes your profile, entries, goals and reminders from this browser. It cannot be undone. Download your data first if you want a copy.</p>
