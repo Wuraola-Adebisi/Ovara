@@ -221,7 +221,7 @@ export function buildLocalInsights(stats: RangeStats, period: 'week' | 'month', 
     insights.push({ title: 'Food notes', body: `You noted ${stats.mealCount} ${plural(stats.mealCount, 'meal or snack', 'meals and snacks')} ${label}.` });
   }
   if (!insights.length) {
-    insights.push({ title: 'Nothing to show yet', body: 'Log some movement, water, food or a mood check-in and your patterns will show up here. Everything is calculated on this device from your own entries.' });
+    insights.push({ title: 'Nothing to show yet', body: 'Add a little movement, water, food or a mood check-in. As you build a picture of your days, useful patterns will appear here.' });
   }
   return insights;
 }
