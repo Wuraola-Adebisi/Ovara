@@ -41,7 +41,7 @@ export default function HomePage() {
         <div className="home-hero-visual">
           <img className="home-hero-image" src="https://images.pexels.com/photos/8497696/pexels-photo-8497696.jpeg?auto=compress&cs=tinysrgb&w=1800" alt="A woman taking a relaxed walk outdoors" fetchPriority="high"/>
           <div className="hero-note hero-note-top"><span className="hero-note-mark">01</span><span>A little movement<br/><b>can change the shape of a day.</b></span></div>
-          <div className="hero-note hero-note-bottom"><span className="hero-note-sun">✳</span><span>There is no perfect way<br/>to look after yourself.</span></div>
+          <div className="hero-note hero-note-bottom"><span className="hero-note-sun" aria-hidden="true">•</span><span><b>A pause is enough.</b><br/>You can begin right where you are.</span></div>
           <div className="hero-photo-caption">Find your own pace. Make it yours.</div>
         </div>
       </div>
