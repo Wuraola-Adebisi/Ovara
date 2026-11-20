@@ -9,7 +9,7 @@ const isText = value => typeof value === 'string';
 const isNumber = value => typeof value === 'number' && Number.isFinite(value);
 const isNonNegative = value => isNumber(value) && value >= 0;
 const isPositive = value => isNumber(value) && value > 0;
-const isDate = value => isText(value) && /^\\d{4}-\\d{2}-\\d{2}$/.test(value) && !Number.isNaN(Date.parse(value + 'T12:00:00'));
+const isDate = value => { if (!isText(value) || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false; const [year, month, day] = value.split('-').map(Number); const date = new Date(year, month - 1, day); return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day; };
 const has = (value, fields) => isObject(value) && fields.every(field => Object.prototype.hasOwnProperty.call(value, field));
 const every = (items, predicate) => Array.isArray(items) && items.every(predicate);
 
@@ -21,7 +21,7 @@ const validators = {
   'ovara.meals': item => has(item, ['id', 'name', 'kind', 'time', 'cal', 'desc']) && isNumber(item.id) && isText(item.name) && isText(item.kind) && isText(item.time) && isNonNegative(item.cal) && isText(item.desc) && (item.date === undefined || isDate(item.date)),
   'ovara.journalEntries': item => has(item, ['id', 'date', 'mood', 'note', 'createdAt']) && isNumber(item.id) && isDate(item.date) && isText(item.mood) && isText(item.note) && isText(item.createdAt),
   'ovara.goals': item => has(item, ['id', 'title', 'category', 'target', 'period', 'createdAt']) && isNumber(item.id) && isText(item.title) && ['steps', 'activity_minutes', 'water_ml', 'routine_completions', 'journal_entries'].includes(item.category) && isPositive(item.target) && ['daily', 'weekly', 'monthly'].includes(item.period) && isText(item.createdAt),
-  'ovara.reminders': item => has(item, ['id', 'title', 'kind', 'time', 'enabled', 'days']) && isNumber(item.id) && isText(item.title) && ['routine', 'hydration', 'reflection', 'movement', 'custom'].includes(item.kind) && isText(item.time) && /^\\d{2}:\\d{2}$/.test(item.time) && Number(item.time.slice(0, 2)) < 24 && Number(item.time.slice(3, 5)) < 60 && typeof item.enabled === 'boolean' && every(item.days, day => Number.isInteger(day) && day >= 0 && day <= 6) && item.days.length > 0,
+  'ovara.reminders': item => has(item, ['id', 'title', 'kind', 'time', 'enabled', 'days']) && isNumber(item.id) && isText(item.title) && ['routine', 'hydration', 'reflection', 'movement', 'custom'].includes(item.kind) && isText(item.time) && /^\d{2}:\d{2}$/.test(item.time) && Number(item.time.slice(0, 2)) < 24 && Number(item.time.slice(3, 5)) < 60 && typeof item.enabled === 'boolean' && every(item.days, day => Number.isInteger(day) && day >= 0 && day <= 6) && item.days.length > 0,
 };
 
 function validateProfile(value) {
