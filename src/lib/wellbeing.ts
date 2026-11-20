@@ -142,9 +142,7 @@ export function collectEvents(data: Data, preferences: Preferences) {
   return events.sort((a, b) => b.date.localeCompare(a.date));
 }
 
-export function getGoalValue(goal: WellbeingGoal, data: Pick<Data, 'activities' | 'water' | 'journals' | 'completions'>, now = new Date(), weekStartsOn: 0 | 1 = 1) {
-  const startKey = localDate(startOfPeriod(now, goal.period, weekStartsOn));
-  const endKey = localDate(now);
+export function getGoalValueForRange(goal: WellbeingGoal, data: Pick<Data, 'activities' | 'water' | 'journals' | 'completions'>, startKey: string, endKey: string) {
   const within = <T extends { date: string }>(items: T[]) => items.filter(item => item.date >= startKey && item.date <= endKey);
   const activities = within(data.activities);
   if (goal.category === 'steps') return activities.reduce((sum, item) => sum + item.steps, 0);
@@ -154,8 +152,11 @@ export function getGoalValue(goal: WellbeingGoal, data: Pick<Data, 'activities' 
   return within(data.journals).length;
 }
 
-export function getRangeStats(period: 'week' | 'month', data: Data, now = new Date()) {
-  const { start, end } = getDateRange(period, now);
+export function getGoalValue(goal: WellbeingGoal, data: Pick<Data, 'activities' | 'water' | 'journals' | 'completions'>, now = new Date(), weekStartsOn: 0 | 1 = 1) {
+  return getGoalValueForRange(goal, data, localDate(startOfPeriod(now, goal.period, weekStartsOn)), localDate(now));
+}
+
+function statsForRange(data: Data, start: Date, end: Date) {
   const inRange = (key: string) => dateInRange(key, start, end);
   const activities = data.activities.filter(item => inRange(item.date));
   const meals = data.meals.filter(item => inRange(getMealDate(item)));
@@ -174,6 +175,24 @@ export function getRangeStats(period: 'week' | 'month', data: Data, now = new Da
     routineCount: completions.length,
     moodAverage: moods.length ? moods.reduce((sum, score) => sum + score, 0) / moods.length : null,
   };
+}
+
+export function getRangeStats(period: 'week' | 'month', data: Data, now = new Date()) {
+  const { start, end } = getDateRange(period, now);
+  return statsForRange(data, start, end);
+}
+
+/** Compare the current period with the immediately preceding period of equal elapsed length. */
+export function getPreviousRangeStats(period: 'week' | 'month', data: Data, now = new Date()) {
+  const current = getDateRange(period, now);
+  const duration = Math.floor((current.end.getTime() - current.start.getTime()) / 86400000) + 1;
+  const end = new Date(current.start);
+  end.setDate(end.getDate() - 1);
+  end.setHours(23, 59, 59, 999);
+  const start = new Date(end);
+  start.setDate(start.getDate() - duration + 1);
+  start.setHours(0, 0, 0, 0);
+  return statsForRange(data, start, end);
 }
 
 export type RangeStats = ReturnType<typeof getRangeStats>;
