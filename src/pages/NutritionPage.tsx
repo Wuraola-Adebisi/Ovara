@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Pencil, Plus, Trash2, X } from 'lucide-react';
 import { useStore } from '../lib/store';
 import { useToday } from '../hooks/useToday';
@@ -19,6 +19,7 @@ function currentTime() {
 
 export default function NutritionPage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const today = useToday();
   const toast = useToast();
   const [meals, setMeals] = useStore('meals');
@@ -26,7 +27,7 @@ export default function NutritionPage() {
   const remove = useUndoRemove(meals, setMeals);
   const [showForm, setShowForm] = useState(Boolean((location.state as { add?: boolean } | null)?.add));
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [selectedDate, setSelectedDate] = useState(today);
+  const [selectedDate, setSelectedDate] = useState(() => (location.state as { calendarDate?: string } | null)?.calendarDate ?? today);
   const [mealName, setMealName] = useState('');
   const [mealKind, setMealKind] = useState('Breakfast');
   const [energy, setEnergy] = useState('');
@@ -62,6 +63,17 @@ export default function NutritionPage() {
     setDescription(meal.desc || '');
     setShowForm(true);
   }
+
+  useEffect(() => {
+    const state = location.state as { calendarEventId?: string; calendarDate?: string } | null;
+    if (state?.calendarDate) setSelectedDate(state.calendarDate);
+    const eventId = state?.calendarEventId;
+    if (!eventId?.startsWith('meal-')) return;
+    const mealId = Number(eventId.slice('meal-'.length));
+    const meal = meals.find(item => item.id === mealId);
+    if (meal) startEdit(meal);
+    navigate(location.pathname, { replace: true, state: null });
+  }, [location.key, meals]);
 
   function saveMeal(event: FormEvent) {
     event.preventDefault();
@@ -124,7 +136,7 @@ export default function NutritionPage() {
         </>}
       </Card>
       <div className="stack">
-        <WaterCard/>
+        <WaterCard date={selectedDate}/>
         <Card title="Last 7 days">
           <dl className="stat-strip">
             <div><dt>Food notes</dt><dd>{weekMealCount}</dd></div>
