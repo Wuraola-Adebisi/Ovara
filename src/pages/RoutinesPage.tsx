@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import type { FormEvent } from 'react';
 import { Edit3, Plus, Trash2, X } from 'lucide-react';
 import { useStore } from '../lib/store';
@@ -13,6 +13,7 @@ const times = ['Morning', 'Afternoon', 'Evening', 'Anytime'];
 
 export default function RoutinesPage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const today = useToday();
   const [habits, setHabits] = useStore('habits');
   const [completions, setCompletions] = useStore('completions');
@@ -24,6 +25,12 @@ export default function RoutinesPage() {
   const [title, setTitle] = useState('');
   const [detail, setDetail] = useState('');
   const [time, setTime] = useState('Anytime');
+
+  useEffect(() => {
+    if ((location.state as { calendarDate?: string } | null)?.calendarDate) {
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [location.key]);
 
   const days = useMemo(() => lastDays(7), []);
   const doneIds = new Set(completions.filter(item => item.date === selectedDate).map(item => item.routineId));
