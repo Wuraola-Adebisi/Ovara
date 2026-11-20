@@ -2,31 +2,31 @@ export type FaqGroup = { id: string; title: string; items: { q: string; a: strin
 
 export const faqGroups: FaqGroup[] = [
   { id: 'start', title: 'Getting started', items: [
-    { q: 'Do I need an account?', a: 'No. Ovara asks for a name when you set up and an email address only if you want one shown. There is no password and nothing to verify.' },
-    { q: 'What can I keep track of?', a: 'Activity, meals, water, routines, mood and a daily journal entry. You can also set goals, see insights and browse everything on a calendar.' },
-    { q: 'Do I have to use every part?', a: 'No. At setup you choose the areas you care about and the Today page leads with them. The other pages stay available whenever you want them.' },
-    { q: 'Is Ovara a medical or fitness programme?', a: 'No. It is a personal log. It does not give medical advice, set targets for your health or provide a training plan.' },
+    { q: 'Do I need an account?', a: 'No. You can start with just your name. There is no password to create.' },
+    { q: 'What can I keep track of?', a: 'Movement, meals, water, routines, how you feel and the things you want to write down. You can also set personal goals and look back at your days on a calendar.' },
+    { q: 'Do I have to use every part?', a: 'Not at all. Choose the parts that matter to you. Everything else will be there if you want it later.' },
+    { q: 'Is Ovara a medical or fitness programme?', a: 'No. Ovara is a personal space for everyday notes and reflection. It does not give medical advice or create a training plan.' },
   ] },
-  { id: 'data', title: 'Your data', items: [
-    { q: 'Where is my data stored?', a: 'In your browser, on the device you use. Ovara has no accounts and does not send your entries to a server.' },
-    { q: 'Can I use Ovara on a second device?', a: 'There is no live sync. You can download your data as a file on the Preferences page and restore it on another device with Restore from a file.' },
-    { q: 'How do I back up or delete my data?', a: 'On the Preferences page, Download my data saves a JSON file and Reset my space deletes everything from this browser. Deleting cannot be undone.' },
-    { q: 'Who can see my entries?', a: 'Anyone who can open your browser profile on your device. Because nothing is sent anywhere, there is no one else, but it also means a shared computer is not private.' },
+  { id: 'data', title: 'Your information', items: [
+    { q: 'Where is my information kept?', a: 'It stays in the browser on the device you use. Ovara does not send your personal notes to an online account.' },
+    { q: 'Can I use Ovara on another device?', a: 'Your information does not move between devices automatically. You can download a copy from Preferences and bring it into Ovara on another device.' },
+    { q: 'How do I keep a copy or start over?', a: 'Open Preferences to download a copy of your information or clear your space. Clearing it cannot be undone, so save a copy first if you might need it.' },
+    { q: 'Who can see my notes?', a: 'Anyone who can access your browser profile on your device may be able to see them. Take care when using a shared computer.' },
   ] },
-  { id: 'tracking', title: 'Tracking', items: [
-    { q: 'Why is there no calorie target?', a: 'Ovara records energy only if you choose to enter it, and never tells you how much to eat. The Food page works without any numbers.' },
-    { q: 'How much is a glass of water?', a: 'Each glass is 250 ml, shown in millilitres or fluid ounces depending on your preference. Your daily target is set on the Preferences page.' },
-    { q: 'What happens to my routines at midnight?', a: 'The ticks reset for the new day and your history is kept. A routine counts as done when it has a check-in for that date.' },
-    { q: 'Can I change an entry after saving it?', a: 'Yes. Activity, food notes, routines and goals can be edited, and journal entries can be rewritten for any past day. Anything you remove shows an Undo button for a few seconds.' },
+  { id: 'tracking', title: 'Everyday notes', items: [
+    { q: 'Why is there no calorie target?', a: 'You can add an energy estimate to a meal if you want, but Ovara will never tell you how much to eat. You can use the Food page without numbers.' },
+    { q: 'How much is a glass of water?', a: 'One glass is 250 ml. You can choose to see water in millilitres or fluid ounces, and set a daily target that feels right for you.' },
+    { q: 'What happens to my routines at the end of the day?', a: 'Your daily check-ins start fresh, while your earlier check-ins stay in your history.' },
+    { q: 'Can I change something after saving it?', a: 'Yes. You can edit activities, meal notes, routines, goals and journal notes. If you remove something by mistake, use Undo when it appears.' },
   ] },
   { id: 'reminders', title: 'Reminders', items: [
-    { q: 'How do reminders work?', a: 'Turn on a reminder on the Preferences page and allow notifications when your browser asks. Reminders appear while Ovara is open in a browser tab.' },
-    { q: 'Why did a reminder not appear?', a: 'Check that notifications are allowed for this site in your browser, the reminder is switched on for that day, and a tab with Ovara is open. Reminders do not run after the tab is closed.' },
+    { q: 'How do reminders work?', a: 'Choose a reminder time in Preferences and allow notifications when your browser asks. Ovara can show reminders while it is open in a browser tab.' },
+    { q: 'Why did a reminder not appear?', a: 'Check that notifications are allowed for Ovara in your browser, that the reminder is switched on for that day and that Ovara is still open in a tab.' },
   ] },
-  { id: 'problems', title: 'If something looks wrong', items: [
-    { q: 'My entries disappeared. What happened?', a: 'Entries live in one browser on one device. They will not appear in a different browser, a private window or after clearing site data. If you have a downloaded file, restore it from the Preferences page.' },
-    { q: 'The day or time looks wrong.', a: 'Ovara uses your device clock and time zone. Check both in your system settings, then reload the page.' },
-    { q: 'A chart is empty.', a: 'Charts only show what you logged in that period. Steps appear once an activity has a step count, and water once you add a glass.' },
+  { id: 'problems', title: 'If something does not look right', items: [
+    { q: 'I cannot see my notes. Where did they go?', a: 'Your notes stay in the browser and on the device where you added them. They will not appear in a different browser or a private window, and clearing browser data removes them. If you saved a copy, you can bring it back from Preferences.' },
+    { q: 'The day or time looks wrong.', a: 'Ovara follows the date, time and time zone set on your device. Check those settings, then reload the page.' },
+    { q: 'Why is a chart empty?', a: 'A chart only reflects what you have added for that period. For example, steps appear when you record an activity with a step count.' },
   ] },
 ];
 
