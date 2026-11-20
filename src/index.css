@@ -440,3 +440,49 @@ ul, ol, dl, dd { margin: 0; padding: 0; list-style: none; }
   .hero-copy { justify-items: stretch; }
   .hero .btn-row { width: 100%; }
 }
+
+/* ---------- Page storytelling and editorial imagery ---------- */
+.page-feature {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 0.78fr);
+  align-items: stretch;
+  min-height: 176px;
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-panel);
+  background: var(--color-tint);
+}
+.page-feature-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  padding: clamp(22px, 3vw, 34px);
+}
+.page-feature-copy p {
+  max-width: 54ch;
+  color: var(--color-muted);
+  font-size: var(--text-base);
+  line-height: 1.65;
+}
+.page-feature .eyebrow {
+  color: var(--color-accent-deep);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  letter-spacing: .1em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+.page-feature img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 176px;
+  max-height: 224px;
+  object-fit: cover;
+}
+@media (max-width: 639px) {
+  .page-feature { grid-template-columns: minmax(0, 1fr); }
+  .page-feature-copy { padding: 22px; }
+  .page-feature img { height: 148px; min-height: 148px; max-height: 148px; }
+}
