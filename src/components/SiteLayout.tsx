@@ -32,7 +32,7 @@ export default function SiteLayout() {
       <div className="container footer-grid">
         <div>
           <Link to="/" className="wordmark-link on-night" aria-label="Ovara, home"><Wordmark/></Link>
-          <p>A little space for movement, nourishment, routines and reflection. Your notes stay on this device.</p>
+          <p>A little space for movement, nourishment, routines and reflection.</p>
         </div>
         <nav aria-label="Explore Ovara">
           <b>Explore</b>
