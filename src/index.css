@@ -637,3 +637,32 @@ ul, ol, dl, dd { margin: 0; padding: 0; list-style: none; }
   .journal-week-day { padding: 9px 1px; }
   .journal-week-day span { font-size: 9px; }
 }
+
+
+/* ---------- Period comparisons and goal history ---------- */
+.comparison-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px 24px; }
+.comparison-metric { display: grid; align-content: start; gap: 6px; min-width: 0; }
+.comparison-metric > span { color: var(--color-muted); font-size: var(--text-sm); font-weight: 600; }
+.comparison-metric > strong { font-family: var(--font-display); font-size: var(--text-2xl); font-variant-numeric: tabular-nums; }
+.comparison-metric > small { color: var(--color-muted); font-size: var(--text-xs); }
+.comparison-track { height: 7px; margin: 3px 0; overflow: hidden; border-radius: var(--radius-pill); background: var(--color-tint); }
+.comparison-track > span { display: block; height: 100%; border-radius: inherit; background: var(--color-accent); }
+.comparison-metric .comparison-previous { color: var(--color-muted); }
+.goal-history { display: grid; gap: 12px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--color-line); }
+.goal-history-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.goal-history-heading b { font-size: var(--text-sm); }
+.goal-history-heading span { color: var(--color-muted); font-size: var(--text-xs); }
+.goal-history-bars { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); align-items: end; gap: 12px; min-height: 112px; }
+.goal-history-period { display: grid; grid-template-rows: 76px auto auto; justify-items: center; align-items: end; gap: 5px; min-width: 0; }
+.goal-history-track { display: flex; align-items: end; justify-content: center; width: 100%; height: 76px; overflow: hidden; border-radius: 8px 8px 3px 3px; background: var(--color-tint); }
+.goal-history-track > span { display: block; width: min(70%, 30px); min-height: 0; border-radius: 6px 6px 2px 2px; background: var(--color-line-strong); }
+.goal-history-track > span.is-current { background: var(--color-accent); }
+.goal-history-period small { color: var(--color-muted); font-size: var(--text-xs); }
+.goal-history-period > b { max-width: 100%; overflow: hidden; color: var(--color-ink); font-size: 10px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 767px) {
+  .comparison-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 16px; }
+}
+@media (max-width: 420px) {
+  .comparison-grid { gap: 18px 12px; }
+  .goal-history-bars { gap: 6px; }
+}
