@@ -3,7 +3,7 @@ import { Check, Trash2 } from 'lucide-react';
 import { useStore } from '../lib/store';
 import { useToday } from '../hooks/useToday';
 import { useUndoRemove } from '../hooks/useUndoRemove';
-import { Card, EmptyState, PageHeader } from '../components/PagePrimitives';
+import { Card, EmptyState, PageFeature, PageHeader } from '../components/PagePrimitives';
 import MoodPicker from '../components/MoodPicker';
 import { formatDay } from '../lib/wellbeing';
 
@@ -53,6 +53,8 @@ export default function JournalPage() {
 
   return <div className="stack">
     <PageHeader title="Journal" desc="One entry a day. Everything stays on this device."/>
+    <PageFeature eyebrow="A moment to check in" text="You do not need the perfect words. A mood, a sentence or a few quiet minutes can help you pause and make sense of how the day has felt." image="https://images.unsplash.com/photo-1455390582262-044cdead8028?auto=format&fit=crop&w=1200&q=85" imageAlt="An open journal and pen on a softly lit desk" />
+
     <div className="grid-2 journal-layout">
       <Card title="Today">
         <MoodPicker name="journal-mood" legend="How are you feeling?" value={mood} onChange={value => { setMood(value); setDirty(true); setSaved(false); }}/>
