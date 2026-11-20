@@ -18,7 +18,7 @@ const features: Feature[] = [
 const extras = [
   ['Gentle reminders', 'Choose a time to remind yourself about water, a pause or anything else you would like to remember.'],
   ['Your preferences', 'Choose the units you are familiar with, set personal targets and pick the day your week begins.'],
-  ['Keep a copy', 'Download your information whenever you like, so you always have a copy to keep.'],
+  ['Keep a copy', 'Download a copy of your information whenever you like.'],
   ['Change your mind', 'Remove something you no longer want to keep. You can also undo a recent removal.'],
 ] as const;
 
