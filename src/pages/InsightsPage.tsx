@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useStore } from '../lib/store';
 import { useToday } from '../hooks/useToday';
-import { Card, PageHeader } from '../components/PagePrimitives';
+import { Card, PageFeature, PageHeader } from '../components/PagePrimitives';
 import BarChart from '../components/BarChart';
 import { formatWater, getRangeStats, localDate, lastDays, sumFor } from '../lib/wellbeing';
 import { getPersonalisedInsights } from '../services/insightsService';
@@ -37,6 +37,8 @@ export default function InsightsPage() {
       <button type="button" aria-pressed={period === 'week'} onClick={() => setPeriod('week')}>7 days</button>
       <button type="button" aria-pressed={period === 'month'} onClick={() => setPeriod('month')}>This month</button>
     </div>}/>
+
+    <PageFeature eyebrow="Look for patterns, not perfection" text="Your entries can help you notice how your weeks unfold. Insights are here to make your own activity easier to understand, not to grade your wellbeing." image="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=85" imageAlt="A wide open landscape beneath a soft morning sky" />
 
     <Card>
       <dl className="stat-strip four">
