@@ -3,7 +3,7 @@ import { ArrowRight, Plus } from 'lucide-react';
 import { useStore } from '../lib/store';
 import { useProfile } from '../context/ProfileContext';
 import { useToday } from '../hooks/useToday';
-import { Card, Meter, PageHeader } from '../components/PagePrimitives';
+import { Card, Meter, PageFeature, PageHeader } from '../components/PagePrimitives';
 import BarChart from '../components/BarChart';
 import MoodPicker from '../components/MoodPicker';
 import WaterCard from '../components/WaterCard';
@@ -57,6 +57,8 @@ export default function Overview() {
       desc={formatDay(today, { weekday: 'long', day: 'numeric', month: 'long' })}
       action={<button type="button" className="btn btn-primary" onClick={() => window.dispatchEvent(new Event('ovara:add'))}><Plus size={18} aria-hidden="true"/>Add</button>}
     />
+
+    <PageFeature eyebrow="Your day, your pace" text="Wellbeing is made up of small choices, changing needs and ordinary moments. Use this space to notice what matters today, then take it one step at a time." image="https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&w=1200&q=85" imageAlt="Warm morning sunlight falling across a peaceful outdoor landscape" />
 
     {profile && profile.goals.length > 0 && <p className="focus-line"><span>Your focus</span>{profile.goals.map(goal => <b className="chip" key={goal}>{goal}</b>)}</p>}
 
