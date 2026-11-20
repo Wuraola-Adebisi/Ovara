@@ -4,7 +4,7 @@ import { Plus, Trash2 } from 'lucide-react';
 import { useStore } from '../lib/store';
 import { useToday } from '../hooks/useToday';
 import { useUndoRemove } from '../hooks/useUndoRemove';
-import { Card, EmptyState, Meter, PageHeader } from '../components/PagePrimitives';
+import { Card, EmptyState, Meter, PageFeature, PageHeader } from '../components/PagePrimitives';
 
 const times = ['Morning', 'Afternoon', 'Evening', 'Anytime'];
 
@@ -37,6 +37,8 @@ export default function RoutinesPage() {
 
   return <div className="stack">
     <PageHeader title="Routines" desc="Small things you want to do regularly. Ticks reset each day and your history is kept." action={<button type="button" className="btn btn-primary" aria-expanded={showForm} onClick={() => setShowForm(value => !value)}><Plus size={18} aria-hidden="true"/>Add a routine</button>}/>
+
+    <PageFeature eyebrow="Make space for what matters" text="A routine should support your life, not become another source of pressure. Start with a few small actions and adjust them as your days change." image="https://images.unsplash.com/photo-1499209974431-9dddcece7f88?auto=format&fit=crop&w=1200&q=85" imageAlt="A calm, sunlit room with a notebook and a plant" />
 
     {showForm && <form className="card form-card" onSubmit={addRoutine}>
       <div className="card-head"><h2>Add a routine</h2></div>
