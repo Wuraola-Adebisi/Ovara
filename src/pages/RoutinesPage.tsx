@@ -5,7 +5,7 @@ import { Edit3, Plus, Trash2, X } from 'lucide-react';
 import { useStore } from '../lib/store';
 import { useToday } from '../hooks/useToday';
 import { useToast } from '../components/Toast';
-import { Card, EmptyState, Meter, PageFeature, PageHeader } from '../components/PagePrimitives';
+import { Card, EmptyState, Meter, PageHeader } from '../components/PagePrimitives';
 import { formatDay, lastDays } from '../lib/wellbeing';
 import type { Habit } from '../lib/types';
 
@@ -87,7 +87,6 @@ export default function RoutinesPage() {
 
   return <div className="stack">
     <PageHeader title="Routines" desc="Build a rhythm around the small things you want to do regularly." action={<button type="button" className="btn btn-primary" aria-expanded={showForm} onClick={() => { if (showForm) resetForm(); else { setEditingId(null); setShowForm(true); } }}><Plus size={18} aria-hidden="true"/>Add a routine</button>}/>
-    <PageFeature eyebrow="Make space for what matters" text="A routine should support your life, not become another source of pressure. Start with a few small actions and adjust them as your days change." image="https://images.unsplash.com/photo-1499209974431-9dddcece7f88?auto=format&fit=crop&w=1200&q=85" imageAlt="A calm, sunlit room with a notebook and a plant" />
 
     {showForm && <form className="card form-card" onSubmit={saveRoutine}>
       <div className="card-head"><h2>{editingId === null ? 'Add a routine' : 'Edit routine'}</h2><button type="button" className="icon-btn" aria-label="Close form" onClick={resetForm}><X size={18}/></button></div>
