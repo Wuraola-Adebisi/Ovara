@@ -52,7 +52,7 @@ export default function SiteLayout() {
           <Link to="/terms">Terms of use</Link>
         </nav>
       </div>
-      <div className="container footer-bottom">&copy; {new Date().getFullYear()} Ovara</div>
+      <div className="container footer-bottom">&copy; {new Date().getFullYear()} Ovara <span aria-hidden="true">·</span> <a href="mailto:hello@withovara.com">hello@withovara.com</a></div>
     </footer>
   </div>;
 }
