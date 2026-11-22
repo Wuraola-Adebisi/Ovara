@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { usePageTitle } from '../components/PagePrimitives';
 
-const contactEmail = import.meta.env.VITE_CONTACT_EMAIL as string | undefined;
+const contactEmail = (import.meta.env.VITE_CONTACT_EMAIL as string | undefined) || 'hello@withovara.com';
 
 export default function ContactPage() {
   usePageTitle('Contact');
@@ -14,7 +14,6 @@ export default function ContactPage() {
 
   function submit(event: FormEvent) {
     event.preventDefault();
-    if (!contactEmail) { setNotice('The contact inbox is not set up yet. Please check back later.'); return; }
     const body = 'From: ' + name + ' (' + email + ')\n\n' + message;
     window.location.href = 'mailto:' + contactEmail + '?subject=' + encodeURIComponent(topic) + '&body=' + encodeURIComponent(body);
     setNotice('Your email app should open with this message ready to send. Nothing is sent until you send it from there.');
@@ -24,6 +23,7 @@ export default function ContactPage() {
     <div className="container narrow">
       <h1>Contact</h1>
       <p className="lead">Questions, feedback or ideas for Ovara are welcome.</p>
+      <p>Email us directly at <a href={'mailto:' + contactEmail}>{contactEmail}</a>.</p>
       <form className="card form-card" onSubmit={submit}>
         <div className="form-grid single">
           <label className="field">Your name<input value={name} onChange={event => setName(event.target.value)} autoComplete="name" required/></label>

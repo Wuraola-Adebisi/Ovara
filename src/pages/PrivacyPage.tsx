@@ -14,7 +14,7 @@ export default function PrivacyPage() {
       { heading: 'How to remove your information', body: <p>Use Download my data on the Preferences page to keep a copy, which you can load again with Restore from a file. Use Reset my space to delete everything from this browser. You can also clear this website's local storage in your browser settings. Deleted data cannot be recovered unless you saved a copy.</p> },
       { heading: 'Children', body: <p>Ovara is a general personal wellbeing tool and is not designed for children. If you are a parent or guardian and believe a child has entered personal information, please get in touch so we can discuss next steps.</p> },
       { heading: 'Changes to this notice', body: <p>If the way Ovara handles information changes, this page will be updated and the date above will change.</p> },
-      { heading: 'Contact', body: <p>For privacy questions, use the <Link to="/contact">contact page</Link>.</p> },
+      { heading: 'Contact', body: <p>For privacy questions, email <a href="mailto:hello@withovara.com">hello@withovara.com</a> or use the <Link to="/contact">contact page</Link>.</p> },
     ]}
   />;
 }

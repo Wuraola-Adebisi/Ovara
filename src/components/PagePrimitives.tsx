@@ -2,10 +2,13 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import type { ReactNode } from 'react';
 
+const SITE_URL = 'https://www.withovara.com';
+
 export function usePageTitle(title: string, pageDescription?: string) {
   const { pathname } = useLocation();
   useEffect(() => {
     const description = pageDescription || 'Ovara brings movement, nourishment, routines and reflection together in one thoughtful space.';
+    const canonicalUrl = SITE_URL + (pathname === '/' ? '/' : pathname.replace(/\/$/, ''));
     document.title = title + ' | Ovara';
     const setMeta = (selector: string, attribute: string, value: string) => {
       let element = document.head.querySelector<HTMLMetaElement>(selector);
@@ -18,10 +21,15 @@ export function usePageTitle(title: string, pageDescription?: string) {
     document.head.querySelector('meta[property="og:title"]')?.setAttribute('content', document.title);
     setMeta('meta[property="og:description"]', 'property', 'og:description');
     document.head.querySelector('meta[property="og:description"]')?.setAttribute('content', description);
+    setMeta('meta[property="og:url"]', 'property', 'og:url');
+    document.head.querySelector('meta[property="og:url"]')?.setAttribute('content', canonicalUrl);
     setMeta('meta[name="twitter:title"]', 'name', 'twitter:title');
     document.head.querySelector('meta[name="twitter:title"]')?.setAttribute('content', document.title);
     setMeta('meta[name="twitter:description"]', 'name', 'twitter:description');
     document.head.querySelector('meta[name="twitter:description"]')?.setAttribute('content', description);
+    let canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    if (!canonical) { canonical = document.createElement('link'); canonical.rel = 'canonical'; document.head.appendChild(canonical); }
+    canonical.href = canonicalUrl;
     setMeta('meta[name="robots"]', 'name', 'robots');
     document.head.querySelector('meta[name="robots"]')?.setAttribute('content', pathname.startsWith('/app') ? 'noindex, nofollow' : 'index, follow');
   }, [title, pageDescription, pathname]);

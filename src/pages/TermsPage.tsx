@@ -16,7 +16,7 @@ export default function TermsPage() {
       { heading: 'Other websites', body: <p>Ovara may link to other websites. Those sites have their own terms, and Ovara is not responsible for them.</p> },
       { heading: 'Limitation of liability', body: <p>To the extent the law allows, Ovara is not liable for indirect, incidental, special or consequential loss arising from your use of the service. Nothing in these terms excludes liability that cannot lawfully be excluded.</p> },
       { heading: 'Changes to these terms', body: <p>These terms may be revised as Ovara changes. The date above shows the latest revision. Continuing to use Ovara after a change means you accept the revised terms.</p> },
-      { heading: 'Contact', body: <p>If you have questions about these terms, use the <Link to="/contact">contact page</Link>.</p> },
+      { heading: 'Contact', body: <p>For questions about these terms, email <a href="mailto:hello@withovara.com">hello@withovara.com</a> or use the <Link to="/contact">contact page</Link>.</p> },
     ]}
   />;
 }
