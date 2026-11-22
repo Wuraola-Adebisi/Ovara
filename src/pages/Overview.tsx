@@ -97,8 +97,8 @@ export default function Overview() {
       action={<button type="button" className="btn btn-primary" onClick={() => window.dispatchEvent(new Event('ovara:add'))}><Plus size={18} aria-hidden="true"/>Add to today</button>}
     />
 
-    <section className="dashboard-hero">
-      <div className="dashboard-hero-copy">
+    <section className="dashboard-welcome">
+      <div className="dashboard-welcome-copy">
         <span className="eyebrow">A little space for yourself</span>
         <h2>Your wellbeing, at your own pace.</h2>
         <p>{hasAnyEntry
@@ -108,10 +108,6 @@ export default function Overview() {
           <Link className="btn btn-primary" to="/app/journal">Check in <ArrowUpRight size={17} aria-hidden="true"/></Link>
           <Link className="dashboard-text-link" to="/app/insights">See your progress <ArrowRight size={16} aria-hidden="true"/></Link>
         </div>
-      </div>
-      <div className="dashboard-hero-photo">
-        <img src="https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&w=1200&q=85" alt="Soft morning light across a green landscape" fetchPriority="high"/>
-        <span>Make today your own</span>
       </div>
     </section>
 

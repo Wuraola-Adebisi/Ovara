@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useStore } from '../lib/store';
 import { useToday } from '../hooks/useToday';
-import { Card, EmptyState, PageFeature, PageHeader } from '../components/PagePrimitives';
+import { Card, EmptyState, PageHeader } from '../components/PagePrimitives';
 import { collectEvents, formatDay, localDate } from '../lib/wellbeing';
 
 const typeLabels = { activity: 'Activity', meal: 'Food', water: 'Water', journal: 'Journal', routine: 'Routine' } as const;
@@ -57,7 +57,6 @@ export default function CalendarPage() {
 
   return <div className="stack">
     <PageHeader title="Calendar" desc="Everything you logged, by day."/>
-    <PageFeature eyebrow="Your life, in the bigger picture" text="See the days behind the numbers. Your calendar brings activity, meals, water, routines and reflections together so you can look back with context." image="https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=1200&q=85" imageAlt="A planner and notebook open on a desk" />
 
     <div className="calendar-layout">
       <Card>
