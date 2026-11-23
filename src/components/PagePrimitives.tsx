@@ -2,28 +2,43 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import type { ReactNode } from 'react';
 
+const siteUrl = 'https://www.withovara.com';
+
 export function usePageTitle(title: string, pageDescription?: string) {
   const { pathname } = useLocation();
   useEffect(() => {
-    const description = pageDescription || 'Ovara brings movement, nourishment, routines and reflection together in one thoughtful space.';
-    document.title = title + ' | Ovara';
+    const description = pageDescription || 'Ovara is a health and wellness space shaped around real life, with room for movement, nourishment, habits and reflection.';
+    const pageUrl = siteUrl + (pathname === '/' ? '/' : pathname.replace(/\/$/, ''));
+    const pageTitle = title + ' | Ovara';
+    document.title = pageTitle;
+
     const setMeta = (selector: string, attribute: string, value: string) => {
       let element = document.head.querySelector<HTMLMetaElement>(selector);
       if (!element) { element = document.createElement('meta'); document.head.appendChild(element); }
       element.setAttribute(attribute, value);
     };
+    const setLink = (selector: string, rel: string, href: string) => {
+      let element = document.head.querySelector<HTMLLinkElement>(selector);
+      if (!element) { element = document.createElement('link'); document.head.appendChild(element); }
+      element.setAttribute('rel', rel);
+      element.setAttribute('href', href);
+    };
+
     setMeta('meta[name="description"]', 'name', 'description');
-    document.head.querySelector('meta[name="description"]')?.setAttribute('content', description);
     setMeta('meta[property="og:title"]', 'property', 'og:title');
-    document.head.querySelector('meta[property="og:title"]')?.setAttribute('content', document.title);
     setMeta('meta[property="og:description"]', 'property', 'og:description');
-    document.head.querySelector('meta[property="og:description"]')?.setAttribute('content', description);
+    setMeta('meta[property="og:url"]', 'property', 'og:url');
     setMeta('meta[name="twitter:title"]', 'name', 'twitter:title');
-    document.head.querySelector('meta[name="twitter:title"]')?.setAttribute('content', document.title);
     setMeta('meta[name="twitter:description"]', 'name', 'twitter:description');
-    document.head.querySelector('meta[name="twitter:description"]')?.setAttribute('content', description);
     setMeta('meta[name="robots"]', 'name', 'robots');
+    document.head.querySelector('meta[name="description"]')?.setAttribute('content', description);
+    document.head.querySelector('meta[property="og:title"]')?.setAttribute('content', pageTitle);
+    document.head.querySelector('meta[property="og:description"]')?.setAttribute('content', description);
+    document.head.querySelector('meta[property="og:url"]')?.setAttribute('content', pageUrl);
+    document.head.querySelector('meta[name="twitter:title"]')?.setAttribute('content', pageTitle);
+    document.head.querySelector('meta[name="twitter:description"]')?.setAttribute('content', description);
     document.head.querySelector('meta[name="robots"]')?.setAttribute('content', pathname.startsWith('/app') ? 'noindex, nofollow' : 'index, follow');
+    setLink('link[rel="canonical"]', 'canonical', pageUrl);
   }, [title, pageDescription, pathname]);
 }
 
