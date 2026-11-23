@@ -23,7 +23,7 @@ const extras = [
 ] as const;
 
 export default function FeaturesPage() {
-  usePageTitle('Explore Ovara', 'Explore Ovara’s approach to movement, nutrition, routines, personal goals and everyday wellbeing.');
+  usePageTitle('Explore Ovara', 'Explore Ovara’s health, fitness and wellness approach to movement, nutrition, routines, personal goals and everyday wellbeing.');
   return <main id="main" className="features-page">
     <div className="container">
       <header className="page-intro">
