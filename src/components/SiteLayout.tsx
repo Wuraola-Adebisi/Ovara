@@ -32,7 +32,8 @@ export default function SiteLayout() {
       <div className="container footer-grid">
         <div>
           <Link to="/" className="wordmark-link on-night" aria-label="Ovara, home"><Wordmark/></Link>
-          <p>A little space for movement, nourishment, routines and reflection.</p>
+          <p>A more thoughtful approach to everyday health and wellbeing.</p>
+          <a href="mailto:hello@withovara.com">hello@withovara.com</a>
         </div>
         <nav aria-label="Explore Ovara">
           <b>Explore</b>
@@ -42,7 +43,7 @@ export default function SiteLayout() {
         </nav>
         <nav aria-label="About Ovara">
           <b>About</b>
-          <Link to="/about">Our approach</Link>
+          <Link to="/about">Our story</Link>
           <Link to="/help">Help</Link>
           <Link to="/contact">Contact</Link>
         </nav>
