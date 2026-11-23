@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
+import { Link } from 'react-router-dom';
 import { usePageTitle } from '../components/PagePrimitives';
 
-const contactEmail = import.meta.env.VITE_CONTACT_EMAIL as string | undefined;
+const contactEmail = 'hello@withovara.com';
 
 export default function ContactPage() {
-  usePageTitle('Contact');
+  usePageTitle('Contact', 'Get in touch with Ovara. We welcome questions, feedback and thoughtful conversations about health and wellbeing.');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [topic, setTopic] = useState('A question about Ovara');
@@ -14,7 +15,6 @@ export default function ContactPage() {
 
   function submit(event: FormEvent) {
     event.preventDefault();
-    if (!contactEmail) { setNotice('The contact inbox is not set up yet. Please check back later.'); return; }
     const body = 'From: ' + name + ' (' + email + ')\n\n' + message;
     window.location.href = 'mailto:' + contactEmail + '?subject=' + encodeURIComponent(topic) + '&body=' + encodeURIComponent(body);
     setNotice('Your email app should open with this message ready to send. Nothing is sent until you send it from there.');
@@ -22,8 +22,10 @@ export default function ContactPage() {
 
   return <main className="prose-page" id="main">
     <div className="container narrow">
-      <h1>Contact</h1>
-      <p className="lead">Questions, feedback or ideas for Ovara are welcome.</p>
+      <span className="eyebrow">We are listening</span>
+      <h1>Let's talk.</h1>
+      <p className="lead">Questions, feedback or ideas are welcome. We value thoughtful conversations and want to hear what matters to you.</p>
+      <p>You can also write to <a href="mailto:hello@withovara.com">hello@withovara.com</a>.</p>
       <form className="card form-card" onSubmit={submit}>
         <div className="form-grid single">
           <label className="field">Your name<input value={name} onChange={event => setName(event.target.value)} autoComplete="name" required/></label>
@@ -34,6 +36,7 @@ export default function ContactPage() {
         <div className="btn-row"><button type="submit" className="btn btn-primary">Prepare email</button></div>
         <p className="muted small-print" role="status">{notice}</p>
       </form>
+      <p className="muted small-print">For details about how information is handled, read our <Link to="/privacy">privacy notice</Link>.</p>
     </div>
   </main>;
 }
