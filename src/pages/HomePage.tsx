@@ -24,7 +24,7 @@ const steps = [
 ] as const;
 
 export default function HomePage() {
-  usePageTitle('Feel good in your own way', 'Make room for all of you. Ovara brings movement, nourishing meals, routines and personal reflection together in one thoughtful wellbeing space.');
+  usePageTitle('Feel good in your own way', 'Ovara is a health, fitness and wellness space for movement, nutrition, habits and personal wellbeing. Explore a more thoughtful way to care for yourself.');
   return <main id="main">
     <section className="home-hero">
       <div className="container home-hero-grid">

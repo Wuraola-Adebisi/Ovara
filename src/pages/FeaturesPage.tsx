@@ -23,7 +23,7 @@ const extras = [
 ] as const;
 
 export default function FeaturesPage() {
-  usePageTitle('Explore Ovara');
+  usePageTitle('Explore Ovara', 'Explore Ovara’s health, fitness and wellness approach to movement, nutrition, routines, personal goals and everyday wellbeing.');
   return <main id="main" className="features-page">
     <div className="container">
       <header className="page-intro">
@@ -46,6 +46,15 @@ export default function FeaturesPage() {
       <section id="more" className="more-grid">
         <h2>A few thoughtful details</h2>
         <dl>{extras.map(([title, body]) => <div key={title}><dt>{title}</dt><dd>{body}</dd></div>)}</dl>
+      </section>
+
+      <section className="prose-page" aria-labelledby="future-insights-title">
+        <div className="container narrow">
+          <span className="eyebrow">What we are working towards</span>
+          <h2 id="future-insights-title">A more considered understanding of wellbeing.</h2>
+          <p>Today, Ovara's summaries are calculated in your browser from the records you choose to keep. We are exploring a future stage that uses Amazon Bedrock to help identify meaningful relationships across wellbeing patterns and create more personalised observations, with clear information and user choice around any use of personal data.</p>
+          <p className="muted small-print">AI-powered analysis is planned work and is not currently available in Ovara. Your wellbeing records are not currently sent to Amazon Bedrock.</p>
+        </div>
       </section>
 
       <div className="cta-inline"><Link to="/app" className="btn btn-primary btn-lg">Find your rhythm<ArrowRight size={20} aria-hidden="true"/></Link></div>
