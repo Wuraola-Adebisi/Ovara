@@ -2,3 +2,5 @@ User-agent: *
 Allow: /
 Disallow: /app
 Disallow: /app/
+
+Sitemap: https://www.withovara.com/sitemap.xml
